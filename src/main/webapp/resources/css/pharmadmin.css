@@ -1,0 +1,60 @@
+/*ADD Naresh*/
+.table th{
+	padding: 0.1rem;
+	text-align: center;
+	color: white;
+}
+ .table td {
+	padding: 0.1rem
+ }
+
+.table td {
+	border: 1px solid #52BCD3 !important
+}
+
+.table th {
+	border: 1px solid black !important
+}
+
+.table th a, .table td a {
+	text-decoration: none;
+}
+
+
+
+.left {
+	text-align: left;
+}
+
+.right {
+	text-align: right;
+}
+
+.center {
+	text-align: center;
+}
+
+table th.hidden {
+	display: none;
+}
+
+table td.hidden {
+	display: none;
+}
+.total td {
+	/*text-align: right;*/
+	background-color: #52BCD3;
+}
+.table tfoot td {
+	padding: 0.01rem;
+	border: 1px solid #52BCD3 !important;
+	background-color: #52BCD3;
+}
+p {
+	margin-bottom: 0rem;
+}
+
+.subtitle-block {
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}

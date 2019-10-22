@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context path="/@APPLICATION_NAME@" 
+         crossContext="false" 
+         reloadable="true">
+
+        <!-- JNDI Datasource -->
+         <ResourceLink global="jdbc/@APPLICATION_NAME@_db" 
+                                   name="jdbc/@APPLICATION_NAME@_db" 
+                                   type="javax.sql.DataSource" /> 
+
+</Context> 

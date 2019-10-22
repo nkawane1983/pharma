@@ -1,0 +1,78 @@
+<table class="table">
+   <thead>
+      <tr>
+         <th
+            style="width: 5%; text-align: left; border: 1px solid #52BCD3;">No.
+         </th>
+         <th
+            style="width: 30%; text-align: left; border: 1px solid #52BCD3;">&nbsp;&nbsp;Branch
+            Name
+         </th>
+         <th
+            style="width: 10%; text-align: center; border: 1px solid #52BCD3;">Cashing</th>
+         <th
+            style="width: 10%; text-align: center; border: 1px solid #52BCD3;">NHS</th>
+         <th
+            style="width: 10%; text-align: center; border: 1px solid #52BCD3;">Banking</th>
+         <th
+            style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            Period
+         </th>
+         <th
+            style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            Email Id
+         </th>
+      </tr>
+   </thead>
+   <tbody>
+      #foreach($obj in $branchlist )
+      <tr>
+         <td
+            style="width: 5%; text-align: left; border: 1px solid #52BCD3;"><a
+            style=" text-decoration: none;"
+            >$obj[0]</a></td>
+         <td style="width: 30%; border: 1px solid #52BCD3;"><a
+            style=" text-decoration: none;">&nbsp;&nbsp;$obj[1]</a></td>
+         <td style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            #if($obj[2]=='No' || $obj[2]!='YES')
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #ff0000;">$obj[2]</p>
+            #else
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #2d862d;">Yes</p>
+            #end
+         </td>
+         <td style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            #if($obj[3]=='No'|| $obj[3]!='YES')
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #ff0000;">$obj[3]</p>
+            #else
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #2d862d;">Yes</p>
+            #end
+         </td>
+         <td style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            #if($obj[4]=='No' || $obj[4]!='YES')
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #ff0000;">$obj[4]</p>
+            #else
+            <p style="background-color: #2d862d; margin-left: 1px; margin-right: 8px; color: white;">Yes</p>
+            #end
+         </td>
+         <td style="width: 10%; text-align: center; border: 1px solid #52BCD3;">
+            #if($period!=$obj[5])
+            <p style="margin-left: 1px; margin-right: 1px; color: white; background-color: #ff0000;">$obj[5]</p>
+            #else
+            <p style="background-color: #2d862d; margin-left: 1px; margin-right: 1px; color: white;">$obj[5]</p>
+            #end
+         </td>
+           <td
+            style="width: 100%; text-align: left; border: 1px solid #52BCD3;"><a
+            style=" text-decoration: none;"
+             href="mailto:$obj[6]">
+	            #if($obj[6].length()<30)
+	            	$obj[6]
+	            #else
+	            	$obj[6].substring(0, 30)
+	            #end
+           
+            </a></td>
+      </tr>
+      #end
+   </tbody>
+</table>

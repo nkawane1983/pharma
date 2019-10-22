@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<context:annotation-config />
+
+	<context:property-placeholder location="classpath:ds.properties" />
+
+
+	<mvc:interceptors>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/*" />
+			<mvc:mapping path="/banking/*" />
+			<mvc:mapping path="/branch/*" />
+			<mvc:mapping path="/careHomes/*" />
+			<mvc:mapping path="/cashing/*" />
+			<mvc:mapping path="/dashboard/*" />
+			<mvc:mapping path="/group/*" />
+			<mvc:mapping path="/nhs/*" />
+			<mvc:mapping path="/proService/*" />
+			<mvc:mapping path="/role/*" />
+			<mvc:mapping path="/sysParameter/*" />
+			<mvc:mapping path="/user/*" />
+			<mvc:mapping path="/userType/*" />
+			<mvc:mapping path="/report/*" />
+			<bean class="com.avee.interceptors.LoggingInterceptor" />
+		</mvc:interceptor>
+
+		<!-- <mvc:interceptor> -->
+		<!-- <mvc:mapping path="/quote/*" /> -->
+		<!-- <mvc:mapping path="/quoteDetail/*" /> -->
+		<!-- <mvc:mapping path="/insuredDetail/*" /> -->
+		<!-- <mvc:mapping path="/endors/*" /> -->
+		<!-- <bean class="com.avee.interceptors.CanUserDoInterceptor" /> -->
+		<!-- </mvc:interceptor> -->
+
+	</mvc:interceptors>
+
+	<context:component-scan base-package="com.avee.config" />
+
+
+	<!-- In this file we configure Hibernate and transactional behavior -->
+	<import resource="applicationContext-persistence.xml" />
+	<!-- In this file we configure Spring Security -->
+	<!-- <import resource="applicationContext-security.xml" /> -->
+<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+
+</bean>
+
+</beans>

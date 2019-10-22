@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="branchdetails" language="groovy" pageWidth="1200" pageHeight="842" columnWidth="1200" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="766bfb49-95e4-4fe5-9c30-728ae75600e5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="562"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="branchId" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[Select internal_branch_id,description from pharma.branch_details where id=$P{branchId}]]>
+	</queryString>
+	<field name="internal_branch_id" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20">
+			<textField>
+				<reportElement mode="Transparent" x="942" y="0" width="108" height="20" backcolor="#CCCCFF" uuid="c5d2a5c8-3cbd-4eed-adcd-7bd11e712299"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Solid" lineColor="#52BCD3"/>
+					<topPen lineWidth="0.25" lineStyle="Solid" lineColor="#52BCD3"/>
+					<leftPen lineWidth="0.25" lineStyle="Solid" lineColor="#52BCD3"/>
+					<bottomPen lineWidth="0.25" lineStyle="Solid" lineColor="#52BCD3"/>
+					<rightPen lineWidth="0.25" lineStyle="Solid" lineColor="#52BCD3"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+					<paragraph lineSpacing="Fixed"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

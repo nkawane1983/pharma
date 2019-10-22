@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	
+	<!-- *************************************************************************************************************** -->
+	<!-- LAYOUT -->
+	<!-- *************************************************************************************************************** -->
+
+	<definition name="loginPg" template="/WEB-INF/pages/login.jsp"></definition>
+	<definition name="forgotPwd" template="/WEB-INF/pages/forgotPwd.jsp"></definition>
+	<definition name="forgotChangePwd" template="/WEB-INF/pages/forgotChangePwd.jsp"></definition>
+	<definition name="monthclosurePg" template="/WEB-INF/pages/monthClosure.jsp"></definition>
+	<!--Support LoginPage -->
+	<definition name="supportloginPg" template="/WEB-INF/pages/support.jsp"></definition>
+
+	<definition name="base.definition" template="/WEB-INF/pages/layout/layout.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="header" value="/WEB-INF/pages/layout/header.jsp" />
+		<put-attribute name="menu" value="/WEB-INF/pages/layout/menu.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/pages/layout/footer.jsp" />
+	</definition>
+
+	<definition name="accessDenied" extends="base.definition">
+		<put-attribute name="title" value="Access Denied" />
+		<put-attribute name="body" value="/WEB-INF/pages/accessDenied.jsp" />
+	</definition>
+
+
+	<definition name="dashboard" extends="base.definition">
+		<put-attribute name="title" value="Dashboard" />
+		<put-attribute name="body" value="/WEB-INF/pages/dashboard.jsp" />
+	</definition>
+
+	<!-- *************************************************************************************************** -->
+	<!-- Import Module -->
+	<!-- *************************************************************************************************** -->
+
+	<definition name="importPg" extends="base.definition">
+		<put-attribute name="title" value="Import File" />
+		<put-attribute name="body" value="/WEB-INF/pages/import.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- Notification Module -->
+	<!-- *************************************************************************************************** -->
+
+	<definition name="notificationpg" extends="base.definition">
+		<put-attribute name="title" value="Notifications" />
+		<put-attribute name="body" value="/WEB-INF/pages/notifications.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- Cashing Module -->
+	<!-- *************************************************************************************************** -->
+
+	<definition name="cashingSearch" extends="base.definition">
+		<put-attribute name="title" value="Cashing Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/cashing/search.jsp" />
+	</definition>
+
+	<definition name="manageCashing" extends="base.definition">
+		<put-attribute name="title" value="New Cashing" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/cashing/manageCashing.jsp" />
+	</definition>
+	<definition name="updateCashingTill" extends="base.definition">
+		<put-attribute name="title" value="Update Till" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/cashing/updateTill.jsp" />
+	</definition>
+
+
+	<!-- *************************************************************************************************** -->
+	<!-- NHS Module -->
+	<!-- *************************************************************************************************** -->
+
+	<definition name="nhsSearch" extends="base.definition">
+		<put-attribute name="title" value="NHS Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/NHS/search.jsp" />
+	</definition>
+	<definition name="managenhs" extends="base.definition">
+		<put-attribute name="title" value="Manage NHS" />
+		<put-attribute name="body" value="/WEB-INF/pages/NHS/manageNHS.jsp" />
+	</definition>
+	<definition name="amendNhs" extends="base.definition">
+		<put-attribute name="title" value="amend NHS" />
+		<put-attribute name="body" value="/WEB-INF/pages/NHS/amendmentsNHS.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- Banking Module -->
+	<!-- *************************************************************************************************** -->
+	<definition name="bankingSearch" extends="base.definition">
+		<put-attribute name="title" value="Banking Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/banking/banking.jsp" />
+	</definition>
+
+	<definition name="manageBanking" extends="base.definition">
+		<put-attribute name="title" value="Manage Banking" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/banking/manageBanking.jsp" />
+	</definition>
+
+	<!-- *************************************************************************************************** -->
+	<!-- Professional Service Module -->
+	<!-- *************************************************************************************************** -->
+
+	<definition name="proServiceSearch" extends="base.definition">
+		<put-attribute name="title" value="Banking Search" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/proService/proServiceSearch.jsp" />
+	</definition>
+
+	<!-- ********************* Care Home ********************************************** -->
+
+	<definition name="manageCareHome" extends="base.definition">
+		<put-attribute name="title" value="Manage CareHomes" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/proService/careHomeMDS.jsp" />
+	</definition>
+
+	<definition name="searchCareHome" extends="base.definition">
+		<put-attribute name="title" value="Care Homes" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/proService/careHomeSearchPg.jsp" />
+	</definition>
+
+	<!-- ********************* Collection & Delivery ********************************************** -->
+
+	<definition name="manageCD" extends="base.definition">
+		<put-attribute name="title" value="Manage Collection and Delivery " />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/proService/manageCD.jsp" />
+	</definition>
+	<definition name="searchCD" extends="base.definition">
+		<put-attribute name="title" value="Collection and Delivery" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/proService/cdSearchPg.jsp" />
+	</definition>
+
+	<!-- *************************************************************************************************** -->
+	<!-- Admin -->
+	<!-- *************************************************************************************************** -->
+
+	<!-- ********************* User ********************************************** -->
+	<definition name="userSearch" extends="base.definition">
+		<put-attribute name="title" value="User Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/user.jsp" />
+	</definition>
+	<definition name="manageUser" extends="base.definition">
+		<put-attribute name="title" value="Manage User" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageUser.jsp" />
+	</definition>
+
+	<!-- ********************* User Type ********************************************** -->
+	<definition name="userTypeSearch" extends="base.definition">
+		<put-attribute name="title" value="User Type Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/userType.jsp" />
+	</definition>
+	<definition name="manageUserType" extends="base.definition">
+		<put-attribute name="title" value="Manage User Type" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageUserType.jsp" />
+	</definition>
+
+	<!-- ********************* Role ********************************************** -->
+	<definition name="roleSearch" extends="base.definition">
+		<put-attribute name="title" value="Role Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/role.jsp" />
+	</definition>
+	<definition name="manageRole" extends="base.definition">
+		<put-attribute name="title" value="Manage Role" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageRole.jsp" />
+	</definition>
+
+	<!-- ********************* Branch ********************************************** -->
+	<definition name="branchSearch" extends="base.definition">
+		<put-attribute name="title" value="Branch Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/branch.jsp" />
+	</definition>
+
+	<definition name="manageBranch" extends="base.definition">
+		<put-attribute name="title" value="Manage Branch" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageBranch.jsp" />
+	</definition>
+
+
+	<!-- ********************* Group ********************************************** -->
+	<definition name="groupSearch" extends="base.definition">
+		<put-attribute name="title" value="Group Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/group.jsp" />
+	</definition>
+	<definition name="manageGroup" extends="base.definition">
+		<put-attribute name="title" value="Manage Group" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageGroup.jsp" />
+	</definition>
+
+	<!-- ********************* Care Homes ********************************************** -->
+	<definition name="careHomesSearch" extends="base.definition">
+		<put-attribute name="title" value="Care Homes Search" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/careHomes.jsp" />
+	</definition>
+
+	<definition name="managecarehome" extends="base.definition">
+		<put-attribute name="title" value="Manage Care Homes" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageCareHome.jsp" />
+	</definition>
+
+	<!-- ********************* System parameter ********************************************** -->
+	<definition name="sysParamSearch" extends="base.definition">
+		<put-attribute name="title" value="System Parameter Search" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/systemParameter.jsp" />
+	</definition>
+	<definition name="manageSysParam" extends="base.definition">
+		<put-attribute name="title" value="Manage System Parameter" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/admin/manageSysParam.jsp" />
+	</definition>
+
+	<!-- ********************* User Profile ********************************************** -->
+	<definition name="profilePg" extends="base.definition">
+		<put-attribute name="title" value="Profile" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/profile.jsp" />
+	</definition>
+
+	<!-- ********************* Setting ********************************************** -->
+	<definition name="setting" extends="base.definition">
+		<put-attribute name="title" value="Setting" />
+		<put-attribute name="body" value="/WEB-INF/pages/admin/Setting.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- Report -->
+	<!-- *************************************************************************************************** -->
+	<definition name="bankingReport" extends="base.definition">
+		<put-attribute name="title" value="Banking Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/bankingReport.jsp" />
+	</definition>
+	<definition name="monthlyBanking" extends="base.definition">
+		<put-attribute name="title" value="Monthly Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/monthlyBankingReport.jsp" />
+	</definition>
+	<definition name="cashReport" extends="base.definition">
+		<put-attribute name="title" value="Cash Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/cashReport.jsp" />
+	</definition>
+	<definition name="monthlyCashReport" extends="base.definition">
+		<put-attribute name="title" value="Monthly Cash Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/monthlyCashReport.jsp" />
+	</definition>
+	<definition name="amendmentTill" extends="base.definition">
+		<put-attribute name="title" value="Amendment Till" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/monthlyCashReport.jsp" />
+	</definition>
+
+	<definition name="nhsReport" extends="base.definition">
+		<put-attribute name="title" value="NHS Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/nhsReport.jsp" />
+	</definition>
+	
+		<definition name="amendnhsReport" extends="base.definition">
+		<put-attribute name="title" value="Amendments NHS Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/nhsReport.jsp" />
+	</definition>
+	
+	<definition name="carehomeReport" extends="base.definition">
+		<put-attribute name="title" value="CareHome Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/careHomeReport.jsp" />
+	</definition>
+	<definition name="colldelvReport" extends="base.definition">
+		<put-attribute name="title" value="Collection Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/collDelivReport.jsp" />
+	</definition>
+	<definition name="monthlyExpensesReport" extends="base.definition">
+		<put-attribute name="title" value="Expenses Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/monthlyExpenses.jsp" />
+	</definition>
+	<definition name="vattaxReport" extends="base.definition">
+		<put-attribute name="title" value="Analysis Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/VatTaxAnalysis.jsp" />
+	</definition>
+	<definition name="couponsReport" extends="base.definition">
+		<put-attribute name="title" value="Coupons Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/monthlyCoupon.jsp" />
+	</definition>
+	<definition name="customerStatsReport" extends="base.definition">
+		<put-attribute name="title" value="Customers Stats Report" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/report/customerStatsReport.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- Help -->
+	<!-- *************************************************************************************************** -->
+	<definition name="help.definition" template="/WEB-INF/pages/helplayout/layout.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="header"
+			value="/WEB-INF/pages/helplayout/header.jsp" />
+		<put-attribute name="menu" value="/WEB-INF/pages/helplayout/menu.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/pages/layout/footer.jsp" />
+	</definition>
+	<!-- ********************* Help ********************************************** -->
+	<definition name="help" extends="help.definition">
+		<put-attribute name="title" value="Help" />
+		<put-attribute name="body" value="/WEB-INF/pages/help.jsp" />
+	</definition>
+	<!-- *************************************************************************************************** -->
+	<!-- E-Schedule Module -->
+	<!-- *************************************************************************************************** -->
+	<definition name="escheduleSearch" extends="base.definition">
+		<put-attribute name="title" value="Search" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/eschedule/searchPg.jsp" />
+	</definition>
+	<definition name="manageschedule" extends="base.definition">
+		<put-attribute name="title" value="Manage schedule" />
+		<put-attribute name="body"
+			value="/WEB-INF/pages/eschedule/manageESchedule.jsp" />
+	</definition>
+</tiles-definitions>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+	<properties>
+		<property name="name">pharmadmin</property>
+		<property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5.5p | %-10.10t | %-25.25C:%-5.5L | %msg%n</property>
+		<property name="LOG_DIR">@LOG_NAME@</property>
+		<!--		<property name="LOG_DIR">${sys:catalina.home}/logs</property> -->
+		<property name="ARCHIVE">${LOG_DIR}/archive</property>
+	</properties>
+
+	<Appenders>
+
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${pattern}"/>
+		</Console>
+
+		<RollingFile name="RollingFile"
+					 fileName="${LOG_DIR}/${name}.log"
+				 	 filePattern="${ARCHIVE}/$${date:yyyy-MM}/${name}-%d{yyyy-MM-dd}-%i.log.gz">
+
+			<PatternLayout>
+				<pattern>${pattern}</pattern>
+			</PatternLayout>
+
+			<Policies>
+				<TimeBasedTriggeringPolicy /><!-- Rotated everyday -->
+				<SizeBasedTriggeringPolicy size="100 MB"/> <!-- Or every 5 MB -->
+			</Policies>
+
+		</RollingFile>
+
+	</Appenders>
+
+	<Loggers>
+
+	    <Logger name="org.hibernate" level="DEBUG" additivity="false">
+			<appender-ref ref="Console"/> <!-- To console -->
+	   </Logger>
+
+	   <Logger name="org.hibernate.type" level="trace" additivity="false">
+			<appender-ref ref="Console"/> <!-- To console -->
+		</Logger>
+
+	   <Logger name="com.avee" level="debug" additivity="false">
+			<appender-ref ref="Console"/> <!-- To console -->
+			<appender-ref ref="RollingFile"/> <!-- And to a rotated file -->
+		</Logger>
+
+		<Root level="debug" additivity="false"> <!-- We log Errors only -->
+			<appender-ref ref="Console"/> <!-- To console -->
+		</Root>
+
+	</Loggers>
+
+</Configuration>

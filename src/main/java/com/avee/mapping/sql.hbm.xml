@@ -1,0 +1,1895 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.avee.mapping">
+
+	<sql-query name="getUnBankingCashAndCheques">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT 
+				ROUND(COALESCE(SUM(cash),0 ),2) as cash
+				,ROUND(COALESCE(SUM(cheques),0 ),2) as cheques 
+				FROM pharma.cash_summary 
+				WHERE 
+					branch_id=:branchId 
+				AND 
+					banking_id=0
+				AND 
+					till_status=1 
+				AND 
+					date BETWEEN :fdate AND :tdate
+		]]>
+	</sql-query>
+	<sql-query name="updateBankingIdInCashing">
+		<query-param name="cashid" type="java.lang.Integer" />
+		<query-param name="bankid" type="java.lang.Integer" />
+		<query-param name="updatedBy1" type="java.lang.String" />
+		<query-param name="updatedDt1" type="java.sql.Timestamp" />
+		<![CDATA[
+				UPDATE pharma.cash_summary
+				SET updated_by= :updatedBy1 
+				,updated_date= :updatedDt1
+				,banking_id= :bankid 
+				WHERE id= :cashid
+		]]>
+	</sql-query>
+
+	<sql-query name="updateBankingIdInTakingsCards">
+		<query-param name="cashid" type="java.lang.Integer" />
+		<query-param name="bankid" type="java.lang.Integer" />
+		<query-param name="updatedBy1" type="java.lang.String" />
+		<query-param name="updatedDt1" type="java.sql.Timestamp" />
+		<![CDATA[
+			UPDATE pharma.takings_cards
+			SET updated_by= :updatedBy1 
+			,updated_date= :updatedDt1
+			,banking_id= :bankid 
+			WHERE cash_id= :cashid
+		]]>
+	</sql-query>
+	<sql-query name="updateBankingIdInTakingsCheques">
+		<query-param name="cashid" type="java.lang.Integer" />
+		<query-param name="bankid" type="java.lang.Integer" />
+		<query-param name="updatedBy1" type="java.lang.String" />
+		<query-param name="updatedDt1" type="java.sql.Timestamp" />
+		<![CDATA[
+					UPDATE pharma.takings_cheques 
+					SET updated_by= :updatedBy1
+					,updated_date= :updatedDt1
+					,banking_id= :bankid 
+					WHERE cash_id=:cashid
+		]]>
+	</sql-query>
+	<sql-query name="getScriptItems">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT 
+				id
+				,carehome_id
+				,CONVERT(VARCHAR(30)
+				,event_date,103)as edate
+				,code_id
+				,form
+				,items
+				 FROM
+				 pharma.scriptitems
+				 WHERE 
+				 	event_date BETWEEN :fdate AND  :tdate
+				 	AND
+				 	carehome_id IN
+				 	(SELECT 
+				 	id 
+				 	FROM 
+				 	pharma.carehome_details 
+				 	WHERE 
+				 		branch_id =:branchId)
+		]]>
+	</sql-query>
+	<sql-query name="getCategoryGroup">
+		<![CDATA[
+			SELECT 
+			DISTINCT category_group 
+			FROM 
+			pharma.category 
+			where 
+			display_order=1 
+			order by category_group asc
+		]]>
+	</sql-query>
+
+	<sql-query name="userGuides">
+		<query-param name="usertype" type="java.lang.String" />
+		<![CDATA[
+			select * 
+			from 
+			pharma.user_guides 
+			where user_type=:usertype
+		]]>
+	</sql-query>
+	<sql-query name="verifyGroupAndBranch">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="groupId" type="java.lang.Integer" />
+		<![CDATA[
+			 SELECT 
+				 DISTINCT b.id 
+				 FROM 
+				 pharma.group_user_details  a
+				 ,pharma.branch_details b
+				 ,pharma.branch_user_details c 
+				 WHERE
+					 (a.user_id=:userId 
+					 AND 
+					 a.group_id=:groupId 
+					 AND 
+					 a.group_id=b.group_id 
+					 AND 
+					 b.id=:branchId) 
+				 OR 
+					 (c.user_id=:userId 
+					 AND 
+					 c.branch_id=:branchId 
+					 AND 
+					 c.branch_id=b.id 
+					 AND 
+					 b.group_id=:groupId)
+		]]>
+	</sql-query>
+	<sql-query name="getMenuDefault">
+		<query-param name="menutype" type="java.lang.String" />
+		<![CDATA[
+			SELECT 
+					menu_id
+					,menu_element_name
+					,menu_element_url
+					,parent_key
+					,display_menu_name
+					,menu_icon 
+			FROM 
+					pharma.menu 
+			WHERE 
+					menu_type=:menutype 
+			order by 
+					menu_order_by asc
+		]]>
+	</sql-query>
+
+	<sql-query name="HQL_GETSCRIPTITEMSBY_GroupID">
+		<query-param name="groupId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT 
+				SUM(paid_form)as pf
+				,SUM(paid_item)as pi
+				,SUM(paid_form_old) as pfo
+				,SUM(paid_item_old)as pio
+				,SUM(exempt_form)as ef
+				,SUM(exempt_item)as ei
+				,SUM(contraceptive_forms)as cf
+				,SUM(contraceptive_items)as ci 
+				FROM 
+				pharma.nhs 
+				WHERE date between :fdate and :tdate and
+					branch_id IN 
+						(SELECT
+						id 
+						FROM 
+						pharma.branch_details 
+						WHERE
+							group_id=:groupId
+						and is_active='true')
+		]]>
+	</sql-query>
+	<sql-query name="HQL_GETSCRIPTITEMSBY_BranchID">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+				SELECT 
+				COALESCE(SUM(paid_form),0 )as pf
+				,COALESCE(SUM(paid_item),0 )as pi
+				,COALESCE(SUM(paid_form_old),0 ) as pfo
+				,COALESCE(SUM(paid_item_old),0 )as pio
+				,COALESCE(SUM(exempt_form),0 )as ef
+				,COALESCE(SUM(exempt_item),0 )as ei
+				,COALESCE(SUM(contraceptive_forms),0 )as cf
+				,COALESCE(SUM(contraceptive_items),0 )as ci 
+					FROM 
+					pharma.nhs 
+					WHERE date between :fdate and :tdate and
+						branch_id=:branchId
+		]]>
+	</sql-query>
+	<sql-query name="HQL_GETSCRIPTITEMSBY_ALL">
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+			SELECT 
+					COALESCE(SUM(paid_form),0 )as pf
+				,COALESCE(SUM(paid_item),0 )as pi
+				,COALESCE(SUM(paid_form_old),0 ) as pfo
+				,COALESCE(SUM(paid_item_old),0 )as pio
+				,COALESCE(SUM(exempt_form),0 )as ef
+				,COALESCE(SUM(exempt_item),0 )as ei
+				,COALESCE(SUM(contraceptive_forms),0 )as cf
+				,COALESCE(SUM(contraceptive_items),0 )as ci 
+				FROM 
+				pharma.nhs 
+				WHERE date between :fdate and :tdate and
+					branch_id IN
+					(SELECT  distinct [branch_id]
+						FROM 
+					[Pharma].[pharma].[vw_users_group_branch] where [uid]=:uId)
+			
+		]]>
+	</sql-query>
+	<sql-query name="unBankingPaidOuts_ALL">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT 
+					type
+					,amount 
+					FROM 
+					pharma.paid_outs t 
+					WHERE
+					 t.cash_id IN 
+						 (SELECT 
+						 id 
+						 FROM 
+						 pharma.cash_summary 
+						 WHERE 
+						 branch_id=:branchId
+						 AND 
+						 banking_id=0 
+						 AND 
+						 date 
+						 BETWEEN :fdate AND :tdate ) 
+		]]>
+	</sql-query>
+	<sql-query name="unBankingPaidOuts_BYCashID">
+		<query-param name="cashId" type="java.lang.String" />
+		<![CDATA[
+			SELECT 
+				type
+				,amount
+				FROM 
+				pharma.paid_outs t 
+				WHERE 
+				t.cash_id IN (SELECT cast(Item as int)
+					FROM [pharma].SplitString(:cashId, ',')) 
+		]]>
+	</sql-query>
+	<sql-query name="monthlyBanking">
+		<!-- <query-param name="branchName" type="java.lang.String" /> -->
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT * FROM 
+					(
+					Select 
+					DATEPART( week, x.edate)as wkday, 
+					CONVERT(VARCHAR(30),x.edate,103) as bank_date
+					, brn.description as brnchname
+					,ROUND(COALESCE(NULLIF(sum(x.cash),0.0),0.0), 2) as cash  
+					from   pharma.branch_details as brn 
+					RIGHT OUTER JOIN 
+					(SELECT  
+					gs as edate
+					,null as cash
+					,b1.id as branch_id 
+					FROM
+					(select DATEADD(DAY, nbr - 1, :fdate)AS gs FROM    ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+					          FROM      sys.columns c
+					        ) nbrs
+					WHERE   nbr - 1 <= DATEDIFF(DAY, :fdate, :tdate))gs,pharma.branch_details b1    
+					UNION 
+					SELECT 
+					bank_date as edate
+					,sum(cash)as cash
+					,branch_id as branch_id 
+					FROM pharma.banking  
+					WHERE 
+					bank_date BETWEEN :fdate  AND :tdate and mark_delete='false'
+					GROUP by bank_date,branch_id
+					)x 
+					ON 
+					(brn.id = x.branch_id) 
+					GROUP BY 
+					brn.internal_branch_id,brn.description,x.edate
+					)x1
+					PIVOT
+					(
+					SUM(cash)
+					FOR[brnchname] IN branchNames
+					)p
+					ORDER BY  1,2 asc
+		]]>
+	</sql-query>
+	<sql-query name="monthlyCollDev">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+			SELECT * 
+				FROM(
+				SELECT 
+				x1.edate
+				,x1.uid as username
+				,CONCAT(COALESCE(sum(x1.coll_items),0 ),',',COALESCE(sum(x1.delv_items),0 ),',',COALESCE(sum(x1.coll_items+x1.delv_items),0 )) as XYZ 
+				from
+				(SELECT  
+				CONVERT(VARCHAR(30), gs,103)as edate
+				,bs.branch_id as branchid
+				,bs.user_id as uid
+				,null as coll_items
+				,null as delv_items 	
+				FROM 
+				(select DATEADD(DAY, nbr - 1, :fdate)AS gs FROM    ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+				          FROM      sys.columns c
+				        ) nbrs
+				WHERE   nbr - 1 <= DATEDIFF(DAY, :fdate, :tdate))gs,pharma.branch_user_details bs  	
+				union	
+				SELECT 
+				CONVERT(VARCHAR(30), event_date,103)as edate
+				,branch_id as branchid 
+				,user_id as uid
+				,SUM(coll_items)as coll_items
+				,SUM(delv_items)as delv_items 	
+				FROM pharma.coll_dev_singups 
+				WHERE 
+				event_date between :fdate AND :tdate
+				GROUP BY user_id, event_date,branch_id 
+				)x1 
+				where x1.branchid=:branchID
+				group by x1.uid,x1.edate,x1.coll_items
+				)x
+				PIVOT
+				(
+				max(xyz)
+				FOR[username] IN(userNames)
+				)p
+				ORDER BY  1,2 asc
+		]]>
+	</sql-query>
+	<sql-query name="expensesReportByUserId">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+			SELECT *
+					FROM
+					(
+					SELECT  
+					b1.id as brnachid
+					,b1.internal_branch_id
+					,b1.description,
+					x.cname as cname
+					,ROUND(COALESCE(SUM(x.expen),0.0), 2)  as expen
+					FROM(
+					SELECT  b1.description as bname,
+						b1.id as branch_id, 
+						cat.category_name as cname, NULL as expen
+						FROM    
+						pharma.branch_details b1
+						,pharma.category cat 
+					WHERE cat.category_group='PaidOuts' 
+					UNION
+					SELECT 
+					null as bname
+					,c.branch_id as branch_id
+					,cat.category_name as cname
+					,SUM(p.amount)as expen 
+					FROM
+					pharma.paid_outs p,
+					pharma.cash_summary c,
+					pharma.category cat 
+					WHERE
+					c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id
+					AND
+					cat.id=p.type 
+					GROUP BY cat.category_name,c.branch_id
+					UNION
+					SELECT brnDet.description         AS bname ,
+					      brnDet.id       AS branch_id ,
+					      'Total'           AS cname ,
+					      ISNULL(SUM(p.amount), 0.0)   AS expen 
+					FROM pharma.branch_details brnDet
+							 left  OUTER JOIN pharma.cash_summary c
+							 ON (c.branch_id = brnDet.id)
+							 inner join 
+							 pharma.paid_outs p
+							 inner join 
+							 pharma.category cat
+						on( cat.id     = p.type)
+					on
+					(c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id)
+					GROUP BY brnDet.description, brnDet.id
+					)x,pharma.branch_details b1
+					WHERE b1.id=x.branch_id and  b1.group_id IN(Select group_id from pharma.group_user_details where user_id=:userId)
+					GROUP BY  b1.description,x.cname,b1.id,b1.internal_branch_id
+					)x
+					PIVOT
+					(
+					SUM(expen)
+					FOR[cname] IN ("Total",categoryNames)
+					)p
+					order by 1
+		]]>
+	</sql-query>
+	<sql-query name="expensesReportByBranchId">
+		<query-param name="branchID" type="java.lang.String" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+			SELECT *
+					FROM
+					(
+					SELECT  
+					b1.id as brnachid
+					,b1.internal_branch_id
+					,b1.description,
+					x.cname as cname
+					,ROUND(COALESCE(SUM(x.expen),0.0), 2)  as expen
+					FROM(
+					SELECT  b1.description as bname,
+						b1.id as branch_id, 
+						cat.category_name as cname, NULL as expen
+						FROM    
+						pharma.branch_details b1
+						,pharma.category cat 
+					WHERE cat.category_group='PaidOuts' 
+					UNION
+					SELECT 
+					null as bname
+					,c.branch_id as branch_id
+					,cat.category_name as cname
+					,SUM(p.amount)as expen 
+					FROM
+					pharma.paid_outs p,
+					pharma.cash_summary c,
+					pharma.category cat 
+					WHERE
+					c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id
+					AND
+					cat.id=p.type 
+					GROUP BY cat.category_name,c.branch_id
+					UNION
+					SELECT brnDet.description         AS bname ,
+					      brnDet.id       AS branch_id ,
+					      'Total'           AS cname ,
+					      ISNULL(SUM(p.amount), 0.0)   AS expen 
+					FROM pharma.branch_details brnDet
+							 left  OUTER JOIN pharma.cash_summary c
+							 ON (c.branch_id = brnDet.id)
+							 inner join 
+							 pharma.paid_outs p
+							 inner join 
+							 pharma.category cat
+						on( cat.id     = p.type)
+					on
+					(c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id)
+					GROUP BY brnDet.description, brnDet.id
+					)x,pharma.branch_details b1
+					WHERE b1.id=x.branch_id and  b1.id in(SELECT cast(Item as int)
+					FROM [pharma].SplitString(:branchID, ',') )
+					GROUP BY  b1.description,x.cname,b1.id,b1.internal_branch_id
+					)x
+					PIVOT
+					(
+					SUM(expen)
+					FOR[cname] IN ("Total",categoryNames)
+					)p
+					order by 1
+		]]>
+	</sql-query>
+	<sql-query name="expensesReportByGroupId">
+		<query-param name="groupId" type="java.lang.String" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+			SELECT *
+					FROM
+					(
+					SELECT  
+					b1.id as brnachid
+					,b1.internal_branch_id
+					,b1.description,
+					x.cname as cname
+					,ROUND(COALESCE(SUM(x.expen),0.0), 2)  as expen
+					FROM(
+					SELECT  b1.description as bname,
+						b1.id as branch_id, 
+						cat.category_name as cname, NULL as expen
+						FROM    
+						pharma.branch_details b1
+						,pharma.category cat 
+					WHERE cat.category_group='PaidOuts' 
+					UNION
+					SELECT 
+					null as bname
+					,c.branch_id as branch_id
+					,cat.category_name as cname
+					,SUM(p.amount)as expen 
+					FROM
+					pharma.paid_outs p,
+					pharma.cash_summary c,
+					pharma.category cat 
+					WHERE
+					c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id
+					AND
+					cat.id=p.type 
+					GROUP BY cat.category_name,c.branch_id
+					UNION
+					SELECT brnDet.description         AS bname ,
+					      brnDet.id       AS branch_id ,
+					      'Total'           AS cname ,
+					      ISNULL(SUM(p.amount), 0.0)   AS expen 
+					
+					FROM pharma.branch_details brnDet
+							 left  OUTER JOIN pharma.cash_summary c
+							 ON (c.branch_id = brnDet.id)
+							 inner join 
+							 pharma.paid_outs p
+							 inner join 
+							 pharma.category cat
+						on( cat.id     = p.type)
+					on
+					(c.date between :fdate and :tdate 
+					AND
+					p.cash_id=c.id 
+					AND
+					p.branch_id=c.branch_id)
+					GROUP BY brnDet.description, brnDet.id
+					)x,pharma.branch_details b1
+					WHERE b1.id=x.branch_id and  b1.group_id in (SELECT cast(Item as int)
+					FROM [pharma].SplitString(:groupId, ',') )
+					GROUP BY  b1.description,x.cname,b1.id,b1.internal_branch_id
+					)x
+					PIVOT
+					(
+					SUM(expen)
+					FOR[cname] IN ("Total",categoryNames)
+					)p
+					order by 1
+		]]>
+	</sql-query>
+	<sql-query name="unBankingCash_All">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+						SELECT
+						COALESCE(SUM(t.quantity),0)  as quantity 
+						,t.denomination_id 
+						from pharma.takings_cash t 
+						WHERE
+						t.cash_id In 
+						(Select 
+						 id 
+						FROM 
+						pharma.cash_summary 
+						WHERE 
+						branch_id=:branchID and banking_id=0 
+						AND date between :fdate  AND :tdate
+						) 
+						group by t.denomination_id 
+						order by t.denomination_id asc
+		]]>
+	</sql-query>
+	<sql-query name="unBankingCashBY_CashID">
+		<query-param name="cashID" type="java.lang.String" /> 
+		<![CDATA[
+					SELECT 
+					COALESCE(SUM(t.quantity),0)  as quantity 
+					,t.denomination_id 
+					FROM pharma.takings_cash t 
+					WHERE 
+					t.cash_id IN (SELECT cast(Item as int)
+					FROM [pharma].SplitString(:cashID, ',')) 
+					GROUP BY t.denomination_id 
+					ORDER BY t.denomination_id ASC
+		]]>
+	</sql-query>
+	<sql-query name="unBankingCheques_All">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+					SELECT 
+					accountno
+					,name 
+					,amount 
+					FROM 
+					pharma.takings_cheques t 
+					WHERE
+					t.cash_id In 
+					(
+					SELECT 
+					id 
+					FROM 
+					pharma.cash_summary 
+					WHERE 
+					branch_id=:branchID
+					AND 
+					banking_id=0 AND date BETWEEN :fdate AND :tdate) 
+		]]>
+	</sql-query>
+	<sql-query name="unBankingChequesBY_CashID">
+		<query-param name="cashID" type="java.lang.String" /> 
+		<![CDATA[
+					SELECT 
+					accountno
+					,name 
+					,amount 
+					FROM pharma.takings_cheques t 
+					WHERE t.cash_id IN (SELECT cast(Item as int)
+					FROM [pharma].SplitString(:cashID, ','))
+		]]>
+	</sql-query>
+
+
+	<sql-query name="defaultSetting_ByGroup">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="groupId" type="java.lang.Integer" />
+	
+		<![CDATA[
+			SELECT b.internal_branch_id,
+				b.description,
+				x.edate,
+				x.mark,
+				x.vaid,
+				x.val,
+				x.dname,
+				x.did 		
+			FROM Pharma.pharma.branch_details b
+			INNER JOIN
+		(SELECT  bd.group_id as gid
+				,bd.branch_id AS bid,
+				bd.start_date as edate
+				,dv.mark_delete as mark,
+				dv.id as vaid,
+				dv.default_value as val,
+				 dt.default_name as dname,
+				 dt.id as did
+		 	FROM 	Pharma.pharma.default_values dv,
+					Pharma.pharma.branch_defaults bd,
+					Pharma.pharma.default_table dt 
+			WHERE
+  					dv.id=bd.value_id
+  			AND
+  					dt.id=dv.default_id
+  			AND 
+					bd.group_id=:groupId
+			AND 
+  					bd.user_id=:userId
+  					)x
+  		on(b.id=x.bid)
+					 
+		]]>
+	</sql-query>
+	<sql-query name="defaultSetting_Bygroupid">
+		<query-param name="defaultName" type="java.lang.String" />
+		<query-param name="groupid" type="java.lang.Integer" />
+		<![CDATA[
+					SELECT dt.default_name,
+						dv.default_value
+					 FROM [Pharma].[pharma].[group_defaults] gd
+					 	,[Pharma].[pharma].[default_values] dv
+					 	,[Pharma].[pharma].[default_table] dt
+					 where gd.[value_id]=dv.id 
+					 	and dv.default_id= dt.id
+					 	and gd.group_id=:groupid
+					 	and dt.default_name=:defaultName
+							 
+		]]>
+	</sql-query>
+
+	<sql-query name="defaultSetting_BydefaultName">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="defaultName" type="java.lang.String" />
+		<![CDATA[
+			SELECT  bd.branch_id AS bid,
+			b.description as bname,
+				bd.group_id as gid,
+				g.description as gname ,
+				bd.start_date as edate,
+				dv.default_value as val
+			FROM 	Pharma.pharma.default_values dv,
+					Pharma.pharma.branch_defaults bd,
+					Pharma.pharma.default_table dt,
+					Pharma.pharma.branch_details b,
+					Pharma.pharma.group_details g
+			WHERE
+  					dv.id=bd.value_id
+  			AND
+  					dt.id=dv.default_id
+  			AND 
+  					bd.user_id=:userId
+  			AND
+  			dt.default_name=:defaultName
+  			and 
+  			b.id=bd.branch_id
+  			and
+  			bd.group_id=b.group_id
+  			and
+  			g.id=bd.group_id
+  			and 
+  			dv.mark_delete=1
+		]]>
+	</sql-query>
+	<sql-query name="getNHSChart_By_BranchId">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<![CDATA[
+				select 
+			REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.pform),0 )as pform
+				from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as pform   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum([paid_form])as pform 
+				      
+				  FROM [Pharma].[pharma].[nhs] 
+				  where   [branch_id]=:branchId and date >getdate()-8
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate 
+		]]>
+	</sql-query>
+	<sql-query name="getNHSChart_By_GroupID">
+		<query-param name="groupId" type="java.lang.Integer" />
+		<![CDATA[
+			select 
+			REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.pform),0 )as pform
+			from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as pform   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum([paid_form])as pform 
+				      
+				  FROM [Pharma].[pharma].[nhs] 
+				  where    date >getdate()-8 and [branch_id]in(select id from pharma.branch_details where group_id=:groupId)
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate 
+		]]>
+	</sql-query>
+	<sql-query name="getNHSChart_All">
+	
+		<![CDATA[
+				select 
+			REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.pform),0 )as pform
+				from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as pform   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum([paid_form])as pform 
+				      
+				  FROM [Pharma].[pharma].[nhs] 
+				  where   date >getdate()-8
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate 
+		]]>
+	</sql-query>
+	<sql-query name="getTakingChart_By_BranchId">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<![CDATA[
+				select 
+			REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.taking),0 )as taking
+				from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as taking   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum(cash+cheques+cards+coupuns+paidouts)as taking 
+				      
+				  FROM [Pharma].[pharma].[cash_summary]
+				  where   [branch_id]=:branchId and date >getdate()-8
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate 
+		]]>
+	</sql-query>
+	<sql-query name="getTakingChart_By_GroupID">
+		<query-param name="groupId" type="java.lang.Integer" />
+		<![CDATA[
+			select 
+			REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.taking),0 )as taking
+			from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as taking   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum(cash+cheques+cards+coupuns+paidouts)as taking 
+				      
+				  FROM [Pharma].[pharma].[cash_summary]
+				  where    date >getdate()-8 and [branch_id]in(select id from pharma.branch_details where group_id=:groupId)
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate 
+		]]>
+	</sql-query>
+	<sql-query name="getTakingChart_All">
+	
+		<![CDATA[
+				select 
+		REPLACE(CONVERT(VARCHAR(30), x.edate,6),' ','-')as edate,
+				COALESCE(sum(x.taking),0 )as taking
+			from (
+				(select CAST(DATEADD(DAY, nbr - 1,getdate()-7  ) AS DATE) as edate,null as taking   FROM ( SELECT    ROW_NUMBER() OVER ( ORDER BY c.object_id ) AS Nbr
+									  	  FROM      sys.columns c
+									) nbrs
+										WHERE   nbr - 1 <= DATEDIFF(DAY, getdate()-7 ,getdate()))
+				
+									union
+				
+				
+				SELECT
+				      CAST(date AS DATE) as edate
+				      ,Sum(cash+cheques+cards+coupuns+paidouts)as taking  
+				      
+				  FROM [Pharma].[pharma].[cash_summary]
+				  where    date >getdate()-8 
+				  group by [date])x
+				  where x.edate < CAST(GETDATE() as DATE)
+				  group by x.edate
+				  order by x.edate
+		]]>
+	</sql-query>
+
+
+	<sql-query name="getNotifications">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+						SELECT
+							  CS.id,
+							  CONVERT(varchar(30), CS.date, 103) AS edate,
+							  CS.till_no,
+							  CS.ref_no,
+							  COALESCE(CS.z_reading, 0) AS z_reading,
+							  COALESCE(CS.cash, 0) AS cash,
+							  COALESCE(CS.cheques, 0) AS cheques,
+							  COALESCE(CS.cards, 0) AS cards,
+							  COALESCE(CS.coupuns, 0) AS coupuns,
+							  COALESCE(CS.paidouts, 0) AS paidouts,
+							  COALESCE(CS.till_status, 0) AS till_status,
+							 -- Pharma.pharma.getUserNameByUserId(AMT.working_by) as workingBy,
+							  COALESCE(AMT.status, 0) AS AMTstatus
+							FROM [Pharma].[pharma].[cash_summary] CS
+							LEFT OUTER JOIN [Pharma].[pharma].[amendmentTilRequest] AMT
+							 ON (CS.branch_id = AMT.branch_id
+							  AND AMT.[cash_id] = CS.id)
+							WHERE CS.date BETWEEN :fdate AND :tdate
+							AND CS.branch_id = :branchId
+							AND CS.till_status IN (0, -1)
+		]]>
+	</sql-query>
+
+	<sql-query name="getBranchDetailsByUIdAsList">
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+			SELECT ROW_NUMBER() OVER (ORDER BY x.[branch_id]) AS ID,x.* FROM
+			(SELECT 
+			      distinct [branch_id]
+			      ,[internal_branch_id]
+			      ,[branch_name]
+			      ,[branch_addr_line1]
+			      ,[branch_town]
+			      ,[branch_postcode]
+			      ,[branch_county_name]
+			      ,[cd_montly_target]
+			      ,[branch_telephone_no]
+			      ,[no_of_tills]
+			      ,'' as uid
+			      ,'' as[usr_id]
+			      ,'' as[usr_first_name]
+			      ,'' as[usr_last_name]
+			      ,'' as[usr_middle_name]
+			      ,'' as[usr_display_name]
+			      ,'' as[usr_email]
+			      ,'' as[usr_designation]
+			      ,'' as[usr_mobile]
+			      ,0 as[group_id]
+			      ,'' as[group_name]
+			      ,'' as[group_addr_line1]
+			      ,0 as[group_county_id]
+			      ,'' as[group_postcode]
+			      ,'' as[group_town]
+			      ,'' as[group_fax_no]
+			      ,'' as[group_telephone_no]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId)x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+	<sql-query name="getBranchDetailsByBranchNameOrGroupNameAsList">
+		<query-param name="branchName" type="java.lang.String" />
+		<query-param name="groupname" type="java.lang.String" />
+		<query-param name="uId" type="java.lang.String" />
+		<query-param name="groupId" type="java.lang.Integer" />
+		<query-param name="branchId" type="java.lang.Integer" />
+		<![CDATA[
+			SELECT ROW_NUMBER() OVER (ORDER BY x.[branch_id]) AS ID,x.* FROM
+			(SELECT 
+ 				    distinct  [branch_id]
+			      ,[internal_branch_id]
+			      ,[branch_name]
+			      ,[branch_addr_line1]
+			      ,[branch_town]
+			      ,[branch_postcode]
+			      ,[branch_county_name]
+			      ,[cd_montly_target]
+			      ,[branch_telephone_no]
+			      ,[no_of_tills]
+			      ,'' as uid
+			      ,'' as[usr_id]
+			      ,'' as[usr_first_name]
+			      ,'' as[usr_last_name]
+			      ,'' as[usr_middle_name]
+			      ,'' as[usr_display_name]
+			      ,'' as[usr_email]
+			      ,'' as[usr_designation]
+			      ,'' as[usr_mobile]
+			      ,0 as[group_id]
+			      ,'' as[group_name]
+			      ,'' as[group_addr_line1]
+			      ,0 as[group_county_id]
+			      ,'' as[group_postcode]
+			      ,'' as[group_town]
+			      ,'' as[group_fax_no]
+			      ,'' as[group_telephone_no]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId and ([branch_name] LIKE :branchName  or [group_name] LIKE :groupname or [group_id]=:groupId or [branch_id]=:branchId))x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+	<sql-query name="getGroupDetailsByUIdAsList">
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+		SELECT ROW_NUMBER() OVER (ORDER BY x.[group_id]) AS ID,x.* FROM
+			(SELECT 
+ 				 distinct [group_id]
+      				,[group_name]
+			      ,[group_addr_line1]
+			      ,[group_county_id]
+			      ,[group_postcode]
+			      ,[group_town]
+			      ,[group_fax_no]
+			      ,[group_telephone_no]
+			      ,'' as uid
+			      ,'' as[usr_id]
+			      ,'' as[usr_first_name]
+			      ,'' as[usr_last_name]
+			      ,'' as[usr_middle_name]
+			      ,'' as[usr_display_name]
+			      ,'' as[usr_email]
+			      ,'' as[usr_designation]
+			      ,'' as[usr_mobile]			      
+			      , 0 as[branch_id]
+			      ,'' as[internal_branch_id]
+			      ,'' as[branch_name]
+			      ,'' as[branch_addr_line1]
+			      ,'' as[branch_town]
+			      ,'' as[branch_postcode]
+			      ,0 as[branch_county_name]
+			      ,0 as[cd_montly_target]
+			      ,'' as[branch_telephone_no]
+			      ,0 as[no_of_tills]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId)x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+	<sql-query name="getGroupDetailsByGroupIdAsList">
+		<query-param name="groupId" type="java.lang.Integer" />
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+		SELECT ROW_NUMBER() OVER (ORDER BY x.[group_id]) AS ID,x.* FROM
+			(SELECT 
+ 				  distinct [group_id]
+      				,[group_name]
+			      ,[group_addr_line1]
+			      ,[group_county_id]
+			      ,[group_postcode]
+			      ,[group_town]
+			      ,[group_fax_no]
+			      ,[group_telephone_no]
+			      ,'' as uid
+			      ,'' as[usr_id]
+			      ,'' as[usr_first_name]
+			      ,'' as[usr_last_name]
+			      ,'' as[usr_middle_name]
+			      ,'' as[usr_display_name]
+			      ,'' as[usr_email]
+			      ,'' as[usr_designation]
+			      ,'' as[usr_mobile]			      
+			      , 0 as[branch_id]
+			      ,'' as[internal_branch_id]
+			      ,'' as[branch_name]
+			      ,'' as[branch_addr_line1]
+			      ,'' as[branch_town]
+			      ,'' as[branch_postcode]
+			      ,0 as[branch_county_name]
+			      ,0 as[cd_montly_target]
+			      ,'' as[branch_telephone_no]
+			      ,0 as[no_of_tills]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId and group_id=:groupId)x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+
+	<sql-query name="getUserDetailsByuserIdOrEmailIdAsList">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="emailId" type="java.lang.String" />
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+	SELECT ROW_NUMBER() OVER (ORDER BY x.[usr_id]) AS ID,x.* FROM
+			(SELECT 
+ 				  distinct  [usr_id]
+			      ,[usr_first_name]
+			      ,[usr_last_name]
+			      ,[usr_middle_name]
+			      ,[usr_display_name]
+			      ,[usr_email]
+			      ,[usr_designation]
+			      ,[usr_mobile]
+ 				  ,0 as[group_id]
+      				,'' as [group_name]
+			      ,'' as [group_addr_line1]
+			      ,0 as [group_county_id]
+			      ,'' as [group_postcode]
+			      ,'' as [group_town]
+			      ,'' as [group_fax_no]
+			      ,'' as[group_telephone_no]
+			      ,'' as uid    
+			      , 0 as[branch_id]
+			      ,'' as[internal_branch_id]
+			      ,'' as[branch_name]
+			      ,'' as[branch_addr_line1]
+			      ,'' as[branch_town]
+			      ,'' as[branch_postcode]
+			      ,0 as[branch_county_name]
+			      ,0 as[cd_montly_target]
+			      ,'' as[branch_telephone_no]
+			      ,0 as[no_of_tills]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId and ([usr_id] LIKE :userId  or [usr_email] LIKE :emailId))x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+
+	<sql-query name="getuserDetailsByUIdAsList">
+		<query-param name="uId" type="java.lang.String" />
+		<![CDATA[
+			SELECT ROW_NUMBER() OVER (ORDER BY x.[usr_id]) AS ID,x.* FROM
+				(SELECT 
+ 				  distinct  [usr_id]
+			      ,[usr_first_name]
+			      ,[usr_last_name]
+			      ,[usr_middle_name]
+			      ,[usr_display_name]
+			      ,[usr_email]
+			      ,[usr_designation]
+			      ,[usr_mobile]
+ 				  ,0 as [group_id]
+      				,'' as [group_name]
+			      ,'' as [group_addr_line1]
+			      ,0 as [group_county_id]
+			      ,'' as [group_postcode]
+			      ,'' as [group_town]
+			      ,'' as [group_fax_no]
+			      ,'' as[group_telephone_no]
+			      ,'' as uid    
+			      , 0 as[branch_id]
+			      ,'' as[internal_branch_id]
+			      ,'' as[branch_name]
+			      ,'' as[branch_addr_line1]
+			      ,'' as[branch_town]
+			      ,'' as[branch_postcode]
+			      ,0 as[branch_county_name]
+			      ,0 as[cd_montly_target]
+			      ,'' as[branch_telephone_no]
+			      ,0 as[no_of_tills]
+		  FROM [Pharma].[pharma].[vw_users_group_branch]  where uid=:uId)x
+		]]>
+		<return alias="domain" class="com.avee.domain.AppUserGroupBranchMapping"></return>
+	</sql-query>
+	<sql-query name="getPrivatePrescriptionValueForNHS">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<![CDATA[
+				SELECT 
+      			 CAST(COALESCE(Sum([z_read_private_value]),'0.0')  AS varchar(30)) as PrivatePrescriptionValue
+				FROM [Pharma].[pharma].[cash_summary] 
+				where [date]=:fdate and [branch_id]=:branchId
+				group by [date]
+		]]>
+	</sql-query>
+
+	<sql-query name="countTotalRecodeIntoMaster">
+
+		<![CDATA[
+					SELECT 
+							COALESCE(max([id]),0) as entrynumber  
+					FROM 
+							[pharma].[PPA_MASTER]
+		]]>
+	</sql-query>
+	<sql-query name="checkBranchCodeExistsOrNotPPA">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="branchCode" type="java.lang.String" />
+		<query-param name="groupId" type="java.lang.Integer" />
+		<![CDATA[
+					SELECT 
+							COUNT(DISTINCT pbc.id)
+						FROM 
+							[Pharma].[pharma].[PPA_branch_code_details] pbc,
+							[Pharma].[pharma].[branch_branchcode_details] bbc,
+							[Pharma].[pharma].[vw_users_group_branch] vwugb
+						WHERE 
+							vwugb.uid=:userId
+						AND 
+							vwugb.group_id=:groupId
+						AND 
+							bbc.branch_id=vwugb.branch_id
+						AND
+							pbc.id=bbc.branchcode_id
+						AND
+							pbc.branch_code=:branchCode
+		]]>
+	</sql-query>
+	<sql-query name="getBranchNameByCodePPA">
+		<query-param name="branchCode" type="java.lang.String" />
+		<!-- <query-param name="groupId" type="java.lang.Integer" /> -->
+		<![CDATA[
+				SELECT      
+				      [branch_name]
+				FROM [pharma].[PPA_branch_code_details] 
+				WHERE [branch_code]=:branchCode
+		]]>
+	</sql-query>
+
+	<sql-query name="Update_PPA_DATA_Import">
+
+		<![CDATA[
+				UPDATE 	p					
+				SET 
+				p.mb_shop_no = b.branch_code_id,
+				p.mb_tradename = b.branch_name
+			 from [Pharma].[pharma].[PPA_DATA] p,
+				 [Pharma].[pharma].[PPA_branch_code_details] b,
+				 [Pharma].[pharma].[branch_branchcode_details] bcode,
+				 [Pharma].[pharma].[branch_details] brn
+				where 
+				p.[sb_ocs_code] = b.branch_code
+				and
+				bcode.[branchcode_id]=b.id
+				and
+				brn.id=bcode.branch_id
+		]]>
+	</sql-query>
+	<sql-query name="Delete_Old_Import_Data_PPA_DATA">
+	<query-param name="userId" type="java.lang.String" />
+		<![CDATA[
+				DELETE FROM [Pharma].[pharma].[PPA_DATA]
+				WHERE created_by = :userId
+		]]>
+	</sql-query>
+	<sql-query name="Delete_Old_Import_Data_PPA_500">
+	<query-param name="userId" type="java.lang.String" />
+		<![CDATA[
+				DELETE FROM [Pharma].[pharma].[PPA_500]
+				WHERE id IN (SELECT
+				    id
+				  FROM [Pharma].[pharma].[PPA_DATA]
+				  WHERE created_by = :userId)
+		]]>
+	</sql-query>
+	<sql-query name="Delete_Old_Import_Data_PPA_600">
+	<query-param name="userId" type="java.lang.String" />
+		<![CDATA[
+					DELETE FROM [Pharma].[pharma].[PPA_600]
+					WHERE id IN (SELECT
+					    id
+					  FROM [Pharma].[pharma].[PPA_DATA]
+					  WHERE created_by = :userId)
+		]]>
+	</sql-query>
+	<sql-query name="Delete_Old_Import_Data_PPA_800">
+	<query-param name="userId" type="java.lang.String" />
+		<![CDATA[
+					DELETE FROM [Pharma].[pharma].[PPA_800]
+					WHERE id IN (SELECT
+					    id
+					  FROM [Pharma].[pharma].[PPA_DATA]
+					  WHERE created_by = :userId)
+					  
+		]]>
+	</sql-query>
+		
+	
+		<sql-query name="getMonthAsList">
+		<query-param name="groupid" type="java.lang.Integer" />
+		<![CDATA[
+				  SELECT 
+						 DISTINCT MONTH(event_date) AS monthPPA 
+						
+				  FROM 
+						[Pharma].[pharma].[monthYears] 
+				  WHERE
+						(group_id=:groupid or 0=:groupid)
+		]]>
+	</sql-query>
+	<sql-query name="getYearAsList">
+		<query-param name="groupid" type="java.lang.Integer" />
+		<![CDATA[
+				  SELECT 
+						 
+						DISTINCT YEAR(event_date) AS yearPPA 
+				  FROM 
+						[Pharma].[pharma].[monthYears] 
+				  WHERE
+						(group_id=:groupid or 0=:groupid)
+		]]>
+	</sql-query>
+	<sql-query name="checkPPADataExistsOrNot">
+		<query-param name="groupid" type="java.lang.Integer" />
+		<query-param name="eventdate" type="java.util.Date" />
+		<![CDATA[
+				  SELECT 
+						COALESCE(COUNT(*),0) AS row_count 
+				  FROM [Pharma].[pharma].[monthYears] 
+				  WHERE 
+						group_id=:groupid 
+				  AND 
+						event_date=:eventdate
+		]]>
+	</sql-query>
+	<sql-query name="Delete_User_Group_Asso">
+		<query-param name="userId" type="java.lang.String" />
+		<![CDATA[
+				DELETE  
+					FROM 
+					[Pharma].[pharma].[group_user_details] where [user_id]=:userId
+		]]>
+	</sql-query>
+	
+	<sql-query name="getCareHomesScriptItemsAsList">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+						SELECT  s.[id]
+									      ,CONVERT(VARCHAR(30), s.event_date,103) as edate
+									      ,COALESCE(sum(s.[seven_form]),0 ) seven_formMDS
+									      ,COALESCE(sum(s.[seven_items]),0 )  seven_itemsMDS
+									      ,COALESCE(sum(s.[twenty_eight_form]),0 )  twenty_eight_formMDS
+									      ,COALESCE(sum(s.[twenty_eight_items]),0 )  twenty_eight_itemsMDS
+									      ,COALESCE(sum(x.seven_form),0 ) as seven_form
+										  ,COALESCE(sum(x.[seven_items]),0 ) as seven_items
+									      ,COALESCE(sum(x.[twenty_eight_form]),0 ) as twenty_eight_form
+									      ,COALESCE(sum(x.[twenty_eight_items]),0 ) as twenty_eight_items
+									  FROM [Pharma].[pharma].[script_items] s
+										left outer join 
+										(SELECT  script_id as scriptid
+									      ,Sum(seven_form) as seven_form
+									      ,SUM(seven_items) as seven_items
+									      ,SUM(twenty_eight_form) as twenty_eight_form
+									      ,SUM(twenty_eight_items) as twenty_eight_items
+									FROM [Pharma].[pharma].[care_home_script_items] where mark_delete='false'
+									group by script_id) as x
+									on(x.scriptid=s.id)
+									  where 
+									   mark_delete='false'
+									  and
+									  branch_id=:branchID
+									  and 
+									  [event_date] between :fdate and :tdate
+									  group by s.[id] , s.event_date
+									  order by s.[event_date]
+		]]>
+	</sql-query>
+	<sql-query name="getByCareHomeScriptItems">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<![CDATA[
+					SELECT 
+					      cr.description as crehomename
+					      ,sum(citm.[seven_form]+citm.[twenty_eight_form]) as form
+					      ,sum(citm.[seven_items]+citm.[twenty_eight_items]) as item
+					  FROM [Pharma].[pharma].[care_home_script_items]  citm,  [Pharma].[pharma].[script_items] sitm ,[Pharma].[pharma].carehome_details cr
+					  where sitm.id=citm.[script_id] and citm.[mark_delete]='false' and sitm.[mark_delete]='false' and cr.id=citm.carehome_id
+					  and sitm.event_date between :fdate and :tdate  and sitm.branch_id=:branchID
+					  group by  cr.description	
+		]]>
+	</sql-query>
+	
+	<sql-query name="checkRemainingCashingUp">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<query-param name="tillno" type="java.lang.Integer" />
+		<![CDATA[
+						SELECT [pharma].[checkremainingcashingup] (
+																   :branchID
+																  ,:fdate
+																  ,:tdate
+																  ,:tillno
+																  )
+		]]>
+	</sql-query>
+	<sql-query name="checkRemainingNHS">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		<query-param name="cp" type="java.lang.Integer" />
+		<![CDATA[
+						SELECT [pharma].[checkremainingNHS] (
+																   :branchID
+																  ,:fdate
+																  ,:tdate
+																  ,:cp
+																  )
+		]]>
+	</sql-query>
+	<sql-query name="checkBranchWorkingDayOrNo">
+		<query-param name="branchId" type="java.lang.Integer" />
+		<query-param name="eventdate" type="java.util.Date" />
+		<![CDATA[
+					SELECT
+					  COALESCE(COUNT(*), 0) AS row_count
+					FROM [Pharma].[pharma].[branch_timings]
+					WHERE [branch_id] = :branchId
+					AND [day_no] = DATEPART(dw, :eventdate)
+							  
+		]]>
+	</sql-query>
+	
+	<sql-query name="couponReportByUserId">
+		<query-param name="userId" type="java.lang.String" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+					SELECT
+					  *
+					FROM (SELECT
+					  btcat.branchid,
+					  btcat.internal_branch_id,
+					  btcat.description,
+					  btcat.[category_name],
+					  COALESCE(x.amount, 0) AS amount
+					FROM (SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  '9999' AS typecat,
+					  'Total' AS category_name
+					FROM [Pharma].[pharma].branch_details btn
+					WHERE btn.group_id IN (SELECT
+					  group_id
+					FROM pharma.group_user_details
+					WHERE user_id = :userId)
+					UNION
+					SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  cat.id AS typecat,
+					  cat.[category_name]
+					FROM [Pharma].[pharma].branch_details btn,
+					     [Pharma].[pharma].[category] cat
+					WHERE cat.[category_group] = 'Coupons'
+					AND btn.group_id IN (SELECT
+					  group_id
+					FROM pharma.group_user_details
+					WHERE user_id = :userId)) btcat
+					LEFT OUTER JOIN (SELECT
+					  c.branch_id,
+					  'Total' AS category_name,
+					  '9999' AS type,
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					GROUP BY c.branch_id
+					UNION
+					SELECT
+					  c.branch_id,
+					  cat.[category_name],
+					  coup.[type],
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					
+					GROUP BY c.branch_id,
+					         cat.[category_name],
+					         coup.[type]) x
+					  ON (x.[type] = btcat.typecat
+					  AND x.branch_id = btcat.branchid)) x
+					PIVOT
+					(
+					SUM(amount)
+					FOR [category_name] IN ("Total", categoryNames)
+					) p
+					
+					ORDER BY 1
+		]]>
+	</sql-query>
+	<sql-query name="couponReportByGroupId">
+		<query-param name="groupId" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+					SELECT
+					  *
+					FROM (SELECT
+					  btcat.branchid,
+					  btcat.internal_branch_id,
+					  btcat.description,
+					  btcat.[category_name],
+					  COALESCE(x.amount, 0) AS amount
+					FROM (SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  '9999' AS typecat,
+					  'Total' AS category_name
+					FROM [Pharma].[pharma].branch_details btn
+					WHERE btn.group_id in(SELECT cast(Item as int)
+					FROM [pharma].SplitString(:groupId, ',') )  
+					UNION
+					SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  cat.id AS typecat,
+					  cat.[category_name]
+					FROM [Pharma].[pharma].branch_details btn,
+					     [Pharma].[pharma].[category] cat
+					WHERE cat.[category_group] = 'Coupons'
+					AND btn.group_id in(SELECT cast(Item as int)
+					FROM [pharma].SplitString(:groupId, ',') )   ) btcat
+					LEFT OUTER JOIN (SELECT
+					  c.branch_id,
+					  'Total' AS category_name,
+					  '9999' AS type,
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					GROUP BY c.branch_id
+					UNION
+					SELECT
+					  c.branch_id,
+					  cat.[category_name],
+					  coup.[type],
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					
+					GROUP BY c.branch_id,
+					         cat.[category_name],
+					         coup.[type]) x
+					  ON (x.[type] = btcat.typecat
+					  AND x.branch_id = btcat.branchid)) x
+					PIVOT
+					(
+					SUM(amount)
+					FOR [category_name] IN ("Total", categoryNames)
+					) p
+					
+					ORDER BY 1
+		]]>
+	</sql-query>
+	<sql-query name="couponReportByBranchId">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+					SELECT
+					  *
+					FROM (SELECT
+					  btcat.branchid,
+					  btcat.internal_branch_id,
+					  btcat.description,
+					  btcat.[category_name],
+					  COALESCE(x.amount, 0) AS amount
+					FROM (SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  '9999' AS typecat,
+					  'Total' AS category_name
+					FROM [Pharma].[pharma].branch_details btn
+					WHERE btn.id in(SELECT cast(Item as int)
+					FROM [pharma].SplitString(:branchID, ',') )
+					UNION
+					SELECT
+					  btn.id AS branchid,
+					  btn.internal_branch_id,
+					  btn.description,
+					  btn.group_id,
+					  cat.id AS typecat,
+					  cat.[category_name]
+					FROM [Pharma].[pharma].branch_details btn,
+					     [Pharma].[pharma].[category] cat
+					WHERE cat.[category_group] = 'Coupons'
+					AND btn.id in(SELECT cast(Item as int)
+					FROM [pharma].SplitString(:branchID, ',') ) ) btcat
+					LEFT OUTER JOIN (SELECT
+					  c.branch_id,
+					  'Total' AS category_name,
+					  '9999' AS type,
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					GROUP BY c.branch_id
+					UNION
+					SELECT
+					  c.branch_id,
+					  cat.[category_name],
+					  coup.[type],
+					  SUM(coup.[amount]) AS amount
+					FROM [Pharma].[pharma].[cash_summary] c,
+					     [Pharma].[pharma].[takings_coupons] coup,
+					     [Pharma].[pharma].[category] cat
+					
+					WHERE c.[date] BETWEEN :fdate AND :tdate
+					AND c.[branch_id] = coup.[branch_id]
+					AND c.id = coup.[cash_id]
+					AND coup.[type] = cat.id
+					AND [category_group] = 'Coupons'
+					
+					GROUP BY c.branch_id,
+					         cat.[category_name],
+					         coup.[type]) x
+					  ON (x.[type] = btcat.typecat
+					  AND x.branch_id = btcat.branchid)) x
+					PIVOT
+					(
+					SUM(amount)
+					FOR [category_name] IN ("Total", categoryNames)
+					) p
+					
+					ORDER BY 1
+		]]>
+	</sql-query>
+	<sql-query name="monthlyExpensesReportByBranchId">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="fdate" type="java.util.Date" />
+		<query-param name="tdate" type="java.util.Date" />
+		
+		<![CDATA[
+					
+				SELECT
+				  *
+				FROM (SELECT
+				  DATEPART(WEEK, x.gs) AS wkday,
+				   CONVERT(VARCHAR(30), x.gs,103)as edate ,
+				  x.cname AS cname,
+				  COALESCE(SUM(c1.expen), 0) AS expen
+				FROM (SELECT
+				  gs,
+				  cname
+				FROM (SELECT
+				       cat.category_name AS cname
+				     FROM pharma.category cat
+				     WHERE cat.category_group = 'PaidOuts') x2,
+				     (SELECT
+				       DATEADD(DAY, nbr - 1, :fdate) AS gs
+				     FROM (SELECT
+				       ROW_NUMBER() OVER (ORDER BY c.object_id) AS Nbr
+				     FROM sys.columns c) nbrs
+				     WHERE nbr - 1 <= DATEDIFF(DAY, :fdate, :tdate)) gs
+				UNION
+				SELECT
+				  gs,
+				  'Total' AS cname
+				FROM (SELECT
+				  DATEADD(DAY, nbr - 1, :fdate) AS gs
+				FROM (SELECT
+				  ROW_NUMBER() OVER (ORDER BY c.object_id) AS Nbr
+				FROM sys.columns c) nbrs
+				WHERE nbr - 1 <= DATEDIFF(DAY, :fdate, :tdate)) gs) x
+				
+				LEFT OUTER JOIN (SELECT
+				  c.date AS edate,
+				  c.branch_id AS branch_id,
+				  cat.category_name AS cname,
+				  SUM(p.amount) AS expen
+				FROM pharma.paid_outs p,
+				     pharma.cash_summary c,
+				     pharma.category cat
+				WHERE c.date BETWEEN :fdate AND :tdate
+				AND p.cash_id = c.id
+				AND p.branch_id = c.branch_id
+				AND cat.id = p.type
+				GROUP BY c.date,
+				         cat.category_name,
+				         c.branch_id
+				UNION
+				SELECT
+				  c.date AS edate,
+				  c.branch_id AS branch_id,
+				  'Total' AS cname,
+				  SUM(p.amount) AS expen
+				FROM pharma.paid_outs p,
+				     pharma.cash_summary c,
+				     pharma.category cat
+				WHERE c.date BETWEEN :fdate AND :tdate
+				AND p.cash_id = c.id
+				AND p.branch_id = c.branch_id
+				AND cat.id = p.type
+				GROUP BY c.date,
+				         c.branch_id) c1
+				  ON (x.gs = c1.edate
+				  AND c1.branch_id = :branchID
+				  AND (x.cname = c1.cname))
+				
+				GROUP BY x.gs,
+				         x.cname) x
+				PIVOT
+				(
+				SUM(expen)
+				FOR cname IN ("Total", categoryNames)
+				) p
+				
+				ORDER BY 1;
+		]]>
+	</sql-query>
+	<sql-query name="getcashSummaryById">
+		<query-param name="id" type="java.lang.Integer" />
+	
+		<![CDATA[
+
+					  SELECT  CASH.[id]
+					      ,CASH.[branch_id]
+					      ,CASH.[date]
+					      ,CASH.[till_no]
+					      ,CASH.[ref_no]
+					      ,CASH.[z_reading]
+					      ,CASH.[voids]
+					      ,CASH.[refunds]
+					      ,CASH.[sales]
+					      ,CASH.[cash]
+					      ,CASH.[cheques]
+					      ,CASH.[cards]
+					      ,CASH.[coupuns]
+					      ,CASH.[paidouts]
+					      ,CASH.[nett0]
+					      ,CASH.[nett1]
+					      ,CASH.[nett2]
+					      ,CASH.[nett3]
+					      ,CASH.[vat0]
+					      ,CASH.[vat1]
+					      ,CASH.[vat2]
+					      ,CASH.[vat3]
+					      ,CASH.[user_id]
+					      ,CASH.[misc_cash]
+					      ,CASH.[z_read_private_value]
+					      ,CASH.[z_read_levy]
+					       ,Pharma.pharma.getUserNameByUserId(CASH.created_by) as created_by 
+					      ,CASH.[created_date]
+					      ,Pharma.pharma.getUserNameByUserId(CASH.updated_by) as updated_by
+					      ,CASH.[updated_date]
+					      ,CASH.banking_id
+					      ,CAST(COALESCE(CASH.[notes]+COALESCE('<br><strong>H.O:-</strong>'+AMT.[comments_by_HO],''), ''+COALESCE('<br><strong>H.O:-</strong>'+AMT.[comments_by_HO],'')) AS varchar(MAX))  as notes
+					      ,CASH.[discrepancy]
+					      ,Pharma.pharma.getUserNameByUserId(CASH.manager) as manager
+					      ,CASH.[till_status]
+					      ,CASH.[floatvalue]
+					      ,CASH.[discount]
+					      ,CASH.[mark_delete]
+					      ,CASH.[delete_comment]
+					  FROM [Pharma].[pharma].[cash_summary] CASH
+					  left outer join 
+					  [Pharma].[pharma].[amendmentTilHO] AMT
+					  on(AMT.cash_id=CASH.id)
+					  where CASH.id=:id	
+									
+		]]>
+			<return alias="domain" class="com.avee.domain.Cashing"></return>
+	</sql-query>
+	<sql-query name="getbranchDetailsGroupId">
+		<query-param name="id" type="java.lang.String" />
+		<query-param name="useid" type="java.lang.String" />
+		<![CDATA[
+							SELECT
+									  b.*
+									FROM [Pharma].[pharma].[branch_details] b,[Pharma].[pharma].group_user_details GA
+									WHERE b.[is_active] = 'true'
+									and GA.group_id=b.group_id
+									and GA.user_id=:useid
+									AND b.[group_id] IN (SELECT
+									  CAST(Item AS int)
+									FROM [pharma].SplitString(:id, ','))
+									ORDER BY b.[id] ASC
+									
+		]]>
+			<return alias="domain" class="com.avee.domain.BranchDetails"></return>
+	</sql-query>
+		<sql-query name="getbranchDetailsGroupIdDropdown">
+		<query-param name="id" type="java.lang.String" />
+		<query-param name="useid" type="java.lang.String" />
+		<![CDATA[
+							SELECT
+									  b.*
+									FROM [Pharma].[pharma].[branch_details] b,[Pharma].[pharma].group_user_details GA
+									WHERE b.[is_active] = 'true'
+									and GA.group_id=b.group_id
+									and GA.user_id=:useid
+									AND (b.[group_id] IN (SELECT
+									  CAST(Item AS int)
+									FROM [pharma].SplitString(:id, ',')) or 0 IN (SELECT
+									  CAST(Item AS int)
+									FROM [pharma].SplitString(:id, ',')))
+									ORDER BY b.[description] ASC
+					  
+									
+		]]>
+			<return alias="domain" class="com.avee.domain.BranchDetails"></return>
+	</sql-query>
+	<sql-query name="getbranchDetailsBranchId">
+		<query-param name="id" type="java.lang.String" />
+	<query-param name="useid" type="java.lang.String" />
+		<![CDATA[
+								SELECT
+									  b.*
+									FROM [Pharma].[pharma].[branch_details] b,[Pharma].[pharma].group_user_details GA
+									WHERE b.[is_active] = 'true'
+									and GA.group_id=b.group_id
+									and GA.user_id=:useid
+									AND b.[id] IN (SELECT
+									  CAST(Item AS int)
+									FROM [pharma].SplitString(:id, ','))
+									ORDER BY b.[id] ASC
+									
+		]]>
+			<return alias="domain" class="com.avee.domain.BranchDetails"></return>
+	</sql-query>
+	<sql-query name="getbranchDetailsAll">
+	<query-param name="useid" type="java.lang.String" />
+		<![CDATA[
+					SELECT
+					  b.*
+					FROM [Pharma].[pharma].[branch_details] b,
+					     [Pharma].[pharma].group_user_details GA
+					WHERE b.[is_active] = 'true'
+					AND GA.group_id = b.group_id
+					AND GA.user_id = :useid
+					ORDER BY b.[id] ASC
+									
+		]]>
+			<return alias="domain" class="com.avee.domain.BranchDetails"></return>
+	</sql-query>
+	
+	<sql-query name="checkBankingByStringComma">
+		<query-param name="branchID" type="java.lang.Integer" />
+		<query-param name="cashId" type="java.lang.String" />
+
+		<![CDATA[
+						SELECT [pharma].[checkBankingByStringComma] (
+																   :branchID
+																  ,:cashId
+																  )
+		]]>
+	</sql-query>
+	
+
+</hibernate-mapping>

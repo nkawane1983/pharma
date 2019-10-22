@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+							  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+							  http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.2.xsd
+							  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+
+	<!-- ============================================================================================ -->
+	<!-- CONFIGURE A JDBC DATASOURCE FOR HIBERNATE TO CONNECT -->
+	<!-- ============================================================================================ -->
+
+   
+   <jee:jndi-lookup id="dataSource"
+    				 jndi-name="jdbc/@APPLICATION_NAME@_db" 
+    				 lookup-on-startup="false"
+    				 resource-ref="true"
+                     proxy-interface="javax.sql.DataSource"/>
+    
+
+	<!--
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${connection.driver_class}" />
+		<property name="url" value="${connection.url}" />
+		<property name="username" value="${connection.username}" /> 
+		<property name="password" value="${connection.password}" /> 
+	</bean>
+	-->
+
+
+	<!-- ============================================================================================ -->
+	<!-- CONFIGURE A HIBERNATE SESSIONFACTORY -->
+	<!-- ============================================================================================ -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.avee.domain" />
+
+		<property name="mappingResources">
+			<list>
+				<value>com/avee/mapping/sql.hbm.xml</value>
+			</list>
+		</property>
+
+
+		<property name="hibernateProperties">
+			<bean
+				class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+				<property name="properties">
+					<props>
+						<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+						<prop key="hibernate.show_sql">${show_sql}</prop>
+						<!-- <prop key="hibernate.hbm2ddl.auto">update</prop> -->
+						<prop key="hibernate.default_schema">${default_schema}</prop>
+						<prop key="hibernate.format_sql">${format_sql}</prop>
+					</props>
+				</property>
+			</bean>
+		</property>
+
+	</bean>
+
+
+	<!-- ============================================================================================ -->
+	<!-- EXCEPTION TRANSLATION BEAN POST PROCESSOR -->
+	<!-- ============================================================================================ -->
+	<bean
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+
+
+	<!-- ============================================================================================ -->
+	<!-- CONFIGURE A TRANSACTION MANAGER -->
+	<!-- ============================================================================================ -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven />
+</beans>

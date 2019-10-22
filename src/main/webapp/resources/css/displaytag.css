@@ -1,0 +1,368 @@
+/* table { */
+/*   border: 1px solid #666; */
+/*   width: 80%; */
+/*   margin: 20px 0 20px 0 !important; */
+/* } */
+
+th,td {
+/*   padding: 2px 4px 2px 4px !important; */
+  text-align: left;
+  vertical-align: top;
+}
+
+thead tr {
+   background-color:#52BCD3 !important
+}
+
+th.sorted {
+/*   background-color: #FFF6D9; */
+	color: #337ab7;
+}
+
+th a,th a:visited {
+  color: #ffffff !important;
+  
+}
+
+th a:hover {
+  text-decoration: underline;
+  color: #ffffff !important;
+}
+
+th.sorted a,th.sortable a {
+  background-position: right;
+  display: #ffffff !important;
+  width: 100%;
+}
+
+th.sortable a {
+  background-image: url(../images/arrow_off.png);
+  background-repeat: no-repeat;
+}
+
+th.order1 a {
+  background-image: url(../images/arrow_down.png);
+  background-repeat: no-repeat;
+}
+
+th.order2 a {
+  background-image: url(../images/arrow_up.png);
+  background-repeat: no-repeat;
+}
+
+tr.odd {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+tr.tableRowEven,tr.even {
+  background-color: #ffffff !important;
+  cursor: pointer;
+}
+
+span.export {
+  padding: 0 4px 1px 20px;
+  display: inline;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.group-1 {
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-top: 1px solid black;
+}
+
+.group-2 {
+  font-style: italic;
+  border-top: 1px solid black;
+}
+
+.subtotal-sum,.grandtotal-sum {
+  font-weight: bold;
+  text-align: right;
+}
+
+.subtotal-header {
+  padding-bottom: 0px;
+  border-top: 1px solid white;
+}
+
+.subtotal-label,.grandtotal-label {
+  border-top: 1px solid white;
+  font-weight: bold;
+}
+
+.grouped-table tr.even {
+  background-color: #fff;
+}
+
+.grouped-table tr.odd {
+  background-color: #fff;
+}
+
+.grandtotal-row {
+  border-top: 2px solid black;
+}
+
+.topbar {
+  position: static;
+}
+
+div.exportlinks {
+	background-color: #FFF5EE;;
+	border: 1px solid #52BCD3 !important;
+	padding: 2px 4px 2px 4px;
+	margin: 2px 0 10px 0;
+	/*width: 79%; */
+	color: #52BCD3 !important;
+}
+
+span.export {
+	padding: 0 4px 1px 20px;
+	display: inline;
+	display: inline-block;
+	cursor: pointer;
+}
+
+span.excel {
+	background-image: url('../img/ico_file_excel.png');
+}
+
+span.csv {
+	background-image: url('../img/ico_file_csv.png');
+}
+
+span.xml {
+	background-image: url('../img/ico_file_xml.png');
+}
+
+span.pdf {
+	background-image: url('../img/ico_file_pdf.png');
+}
+
+span.rtf {
+	background-image: url('../img/ico_file_rtf.png');
+}
+
+span.pagebanner {
+	/* background-color: #00DDCC; */
+	border: 1px dotted #999;
+	/*padding: 2px 4px 2px 4px;*/
+/*	margin: 10px 5px 10px 5px; */
+	width: 40%; 
+	display: block ;
+	border-bottom: none;
+	font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
+/*	font-size: small;	  */
+	font-size: 11px;
+	font-weight: bold ;	
+	color: #404040;	
+}
+
+span.pagelinks {
+	border: 1px dotted #999;
+	/*padding: 2px 4px 2px 4px;*/
+/*	margin: -10px 5px -5px 5px; */
+	width: 100%;   
+	display: block ;  
+	border-top: none;
+	/*margin-bottom: -5px;*/
+	font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	color: #404040;
+}
+
+span.pagelinks a{
+	color: #404040;
+}
+
+/* Copied from bootstrap.css within LMS */
+
+/*Pagination*/
+
+.pagination {
+  margin: 20px 0;
+}
+
+.pagination ul {
+  display: inline-block;
+  *display: inline;
+  margin-bottom: 0;
+  margin-left: 0;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  *zoom: 1;
+}
+
+.pagination ul > li {
+  display: inline;
+}
+
+.pagination ul > li > a,
+.pagination ul > li > span {
+  float: left;
+  padding: 4px 12px;
+  line-height: 20px;
+  text-decoration: none;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-left-width: 0;
+}
+
+.pagination ul > li > a:hover,
+.pagination ul > .active > a,
+.pagination ul > .active > span {
+  background-color: #f5f5f5;
+}
+
+.pagination ul > .active > a,
+.pagination ul > .active > span {
+  color: #999999;
+  cursor: default;
+}
+
+.pagination ul > .disabled > span,
+.pagination ul > .disabled > a,
+.pagination ul > .disabled > a:hover {
+  color: #999999;
+  cursor: default;
+  background-color: transparent;
+}
+
+.pagination ul > li:first-child > a,
+.pagination ul > li:first-child > span {
+  border-left-width: 1px;
+  -webkit-border-bottom-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+          border-top-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  -moz-border-radius-topleft: 4px;
+}
+
+.pagination ul > li:last-child > a,
+.pagination ul > li:last-child > span {
+  -webkit-border-top-right-radius: 4px;
+          border-top-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+}
+
+.pagination-centered {
+  text-align: center;
+}
+
+.pagination-right {
+  text-align: right;
+}
+
+
+/* End of bootstrap.css within LMS */
+.group-1 {
+    font-weight:bold;
+    padding-bottom:10px;
+    border-top:1px solid black;
+}
+.group-2 {
+    font-style:italic;
+    border-top: 1px solid black;
+
+}
+.subtotal-sum, .grandtotal-sum {
+    font-weight:bold;
+    text-align:right;
+}
+.subtotal-header {
+    padding-bottom: 0px;
+    border-top: 1px solid white;
+}
+.subtotal-label, .grandtotal-label {
+    border-top: 1px solid white;
+    font-weight: bold;
+}
+.grouped-table tr.even {
+    background-color: #fff;
+}
+.grouped-table tr.odd {
+    background-color: #fff;
+}
+.grandtotal-row {
+    border-top: 2px solid black;
+}
+
+
+.myDispTable tr.rowMouseOver {
+     background-repeat: repeat-x;
+     background-color: #ffff99;
+}
+
+.rightColumn {
+	text-align: right;
+}
+
+.idColumn {
+	width: 6%;
+	text-align: right;
+}
+
+.selectColumn {
+	width:9%;
+	text-align: center;
+}
+
+.branchName {
+	width:12%;
+	text-align: left;
+}
+
+.locumName {
+	width:14%;
+	text-align: left;
+}
+
+.eventDate {
+	width: 10%;
+	text-align: left;
+}
+
+.hours {
+	width: 7%;
+	text-align: right;
+}
+
+.timings {
+	width: 9%;
+	text-align: center;
+}
+
+.rate {
+	width: 5%;
+	text-align: right;
+}
+
+.locumCost {
+	width: 7%;
+	text-align: right;
+}
+
+.travelCost {
+	width: 7%;
+	text-align: right;
+}
+
+.mur {
+	width: 6%;
+	text-align: right;
+}
+
+.totals {
+	width: 7%;
+	text-align: right;
+}
+
+
+

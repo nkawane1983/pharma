@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CashSummary" language="groovy" pageWidth="870" pageHeight="842" orientation="Landscape" columnWidth="830" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="65bd245a-4ae6-49ac-b30a-c31a679cfd7e">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="352"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<parameter name="branch_Id" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fdate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tdate" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT b1.id,
+				b1.internal_branch_id,b1.description,
+				COALESCE(sum(c1.z_reading),0 )as z_reading, COALESCE(sum(c1.voids),0 ) as voids, COALESCE(sum(c1.sales),0 ) as sales
+				,COALESCE(sum(c1.refunds),0 )as refunds,COALESCE(sum(c1.cash),0 )as cash, COALESCE(sum(c1.cheques),0 )as cheques,COALESCE(sum(c1.cards),0 )as cards
+				,COALESCE(sum(c1.coupuns),0 )as coupuns, COALESCE(sum(c1.paidouts),0 )as paidouts , COALESCE(sum(c1.taking),0 )as taking, COALESCE(sum(c1.vat0),0 )as vat0 , COALESCE(sum(c1. vat1),0 )as vat1 , COALESCE(sum(c1. vat2),0 )as vat2
+				,COALESCE(sum(c1.NHSItems),0 )as NHSItems
+				,COALESCE(sum(c1.Levy),0 ) as Levy
+				from pharma.branch_details b1
+				INNER JOIN
+				(	select id,group_id from pharma.branch_details
+
+				) as xy
+					on(xy.id IN(1,2,3,4,5) and b1.id=xy.id)
+
+				left outer join
+				(
+				select
+				branch_id as brancid
+				,null as z_reading
+				,null as voids
+				,null as sales
+				,null as refunds
+				,null as cash
+				,null as cheques
+				,null as cards
+				,null as coupuns
+				,null as paidouts
+				,null as taking
+				,null as vat0
+				,null as vat1
+				,null as vat2
+				,sum(paid_item+paid_item_old+exempt_item+contraceptive_items) as NHSItems
+				,Sum(((paid_item-no_charge_item)*prescription_charge)+((paid_item_old-no_charge_item_old)*prescription_charge_old))as Levy
+				from  pharma.nhs where date between $P{fdate} and $P{tdate}
+				group by branch_id
+				union
+				select
+				c1.branch_id as brancid
+				,sum(c1.z_reading)as z_reading, sum(c1.voids) as voids,sum(c1.sales) as sales
+				,sum(c1.refunds) as refunds,sum(c1.cash)as cash
+				,sum(c1.cheques)as cheques, sum(c1.cards)as cards
+				,sum(c1.coupuns)as coupuns, sum(c1.paidouts)as paidouts
+				,sum(c1.cash+c1.cards+c1.cheques+c1.paidouts+c1.coupuns)as taking
+				,sum(c1.vat0)as vat0
+				,sum(c1.vat1)as vat1
+				,sum(c1.vat2)as vat2
+				,null as NHSItems
+				,null as Levy
+				FROM pharma.cash_summary c1 where
+				date between $P{fdate} and $P{tdate}
+				group by c1.branch_id
+				)c1
+				on(c1.brancid=b1.id)
+				group by b1.id,b1.internal_branch_id,b1.description
+				order by b1.id asc;]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="internal_branch_id" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="z_reading" class="java.lang.Double"/>
+	<field name="voids" class="java.math.BigDecimal"/>
+	<field name="sales" class="java.math.BigDecimal"/>
+	<field name="refunds" class="java.lang.Double"/>
+	<field name="cash" class="java.lang.Double"/>
+	<field name="cheques" class="java.lang.Double"/>
+	<field name="cards" class="java.lang.Double"/>
+	<field name="coupuns" class="java.lang.Double"/>
+	<field name="paidouts" class="java.lang.Double"/>
+	<field name="taking" class="java.lang.Double"/>
+	<field name="vat0" class="java.lang.Double"/>
+	<field name="vat1" class="java.lang.Double"/>
+	<field name="vat2" class="java.lang.Double"/>
+	<field name="nhsitems" class="java.math.BigDecimal"/>
+	<field name="levy" class="java.lang.Double"/>
+	<group name="Group">
+		<groupExpression><![CDATA[$F{id}]]></groupExpression>
+		<groupHeader>
+			<band height="5"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="29" splitType="Stretch">
+			<frame>
+				<reportElement mode="Transparent" x="0" y="0" width="830" height="29" backcolor="#CCCCFF" uuid="9f2f4442-31d1-4f15-8240-8d2bcbce8ec1"/>
+				<staticText>
+					<reportElement x="54" y="0" width="178" height="20" uuid="61419dfe-9934-4021-9390-1c37f0a009d1">
+						<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+					</reportElement>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="10" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Monthly Cash Summary]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}.equals( 1 )]]></printWhenExpression>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="830" height="20" backcolor="#FFFF99" uuid="aa1fc760-b59c-4ee0-9fd3-54a93a301e23"/>
+				<staticText>
+					<reportElement positionType="Float" x="0" y="0" width="54" height="20" uuid="1e056160-2f91-4afe-b5fb-e4d6513043d2">
+						<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Arial" isBold="false"/>
+					</textElement>
+					<text><![CDATA[BranchNo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="54" y="0" width="70" height="20" uuid="84e44cb6-05cb-4879-bf02-5ab68439339c"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[BranchName]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="124" y="0" width="54" height="20" uuid="50936c32-8a82-4aa4-b23d-d7727654a8be"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[ZReading]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="178" y="0" width="54" height="20" uuid="95384866-e29e-4351-bec4-caf4d8a31ba3"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Voids]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="232" y="0" width="54" height="20" uuid="d0ea5267-1e2f-414b-9f0b-faefb0e76020"/>
+					<text><![CDATA[Refunds]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="286" y="0" width="54" height="20" uuid="fa9d003a-31af-41e8-bb24-6164bdfdbd05"/>
+					<text><![CDATA[NHSLevy]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="340" y="0" width="54" height="20" uuid="e93f6780-a65d-4b38-ab66-7cb5c8994a3d"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Avg.Sale]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="394" y="0" width="54" height="20" uuid="b17f2be2-49d8-4bd8-9708-13d802d26c3a"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Cash]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="448" y="0" width="54" height="20" uuid="7effb83c-60a3-4cb0-868a-41dea14e2c86"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Cheques]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="502" y="0" width="54" height="20" uuid="00a15ba5-d755-4747-8486-718828f548cf"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Cards]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="556" y="0" width="54" height="20" uuid="8206dea1-883c-425f-be21-e07a92cfa4f8"/>
+					<textElement>
+						<font fontName="Arial"/>
+					</textElement>
+					<text><![CDATA[Coupons]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="610" y="0" width="54" height="20" uuid="892a85cc-e8c5-42b2-a255-e70f8d4ff234"/>
+					<text><![CDATA[PaidOuts]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="664" y="0" width="57" height="20" uuid="64f25e58-26c4-4298-a6e4-6aa8197dac8d"/>
+					<text><![CDATA[Takings]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="721" y="0" width="54" height="20" uuid="d87ff72f-5c7a-40dc-b9f4-6abb178646b2"/>
+					<text><![CDATA[Discrep.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="775" y="0" width="55" height="20" uuid="e1a02346-7152-4004-b915-0af7ecfe0a1e">
+						<property name="net.sf.jasperreports.export.xls.column.width" value="80"/>
+						<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="TRUE"/>
+						<property name="net.sf.jasperreports.print.keep.full.text" value="TRUE"/>
+					</reportElement>
+					<text><![CDATA[Total Items]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="54" height="17" uuid="b6ee09fc-c30e-4bf1-b458-da6a95861dba">
+					<property name="net.sf.jasperreports.export.xls.column.width" value="30"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{internal_branch_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement positionType="Float" mode="Transparent" x="54" y="0" width="70" height="17" uuid="22c4cbb9-a652-4a2b-8160-9606f5fb70bb">
+					<property name="net.sf.jasperreports.export.xls.column.width" value="220"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="124" y="0" width="54" height="17" uuid="9f34ad4a-2719-4266-8ce7-6a2fa06fcb6f">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{z_reading}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="178" y="0" width="54" height="17" uuid="9ca7a1e1-29a0-4b38-8f37-d111389b071e">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0;-###0"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voids}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="286" y="0" width="54" height="17" uuid="35da9626-9e57-45ee-bd8a-ee8877b29a1f">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{levy}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="232" y="0" width="54" height="17" uuid="07fc1223-94b4-4e65-bc5b-5bbcdd351430">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{refunds}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="394" y="0" width="54" height="17" uuid="9fd05d91-ecda-4551-9887-6a064e765b19">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cash}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="448" y="0" width="54" height="17" uuid="69be664f-7f70-4103-81d3-32f098ee831c">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cheques}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="502" y="0" width="54" height="17" uuid="7345a9ec-d1d8-4f90-896b-ea4f2347b020">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cards}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="556" y="0" width="54" height="17" uuid="48d9566a-2d37-49ec-ac27-a833c7401108">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{coupuns}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="610" y="0" width="54" height="17" uuid="958e95f2-0690-43aa-b2bb-660425d0f30a">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{paidouts}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="664" y="0" width="57" height="17" uuid="7d2234cf-ece6-4167-ba47-ce49ff36b815">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taking}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="721" y="0" width="54" height="17" uuid="dc589a2a-80b9-4e28-91f2-2fa016d4e32c">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taking}-$F{z_reading}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="775" y="0" width="55" height="17" uuid="9c0817a6-9afb-45fa-b854-96806132e2b6">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0;-###0"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nhsitems}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="340" y="0" width="54" height="17" uuid="33690454-8622-4655-b048-69ee29f34aba">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true "/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true "/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false "/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{taking}-$F{levy})/$F{sales}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="54" y="0" width="70" height="17" uuid="56bcd6e4-5d8b-48cd-9fb0-aa46954f2a9b"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="124" y="0" width="54" height="17" uuid="f1504356-56fd-4c1c-b309-bfd108e2f762">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(C3:C"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="178" y="0" width="54" height="17" uuid="5dbccd8f-d15a-4998-a126-e159dad93056">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0;-###0"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(D3:D"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="232" y="0" width="54" height="17" uuid="c354c68b-2f38-46ed-bfdc-6df7fb15c9f9">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(E3:E"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="286" y="0" width="54" height="17" uuid="a8cea0b2-43ab-45a3-9f32-65e2dc39fb32">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(F3:F"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="340" y="0" width="54" height="17" uuid="4f6e45a3-12bf-4c69-b8fd-501c8ad8a5af">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(G3:G"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="394" y="0" width="54" height="17" uuid="1ae3fb6a-2b86-4285-80a0-f3a47d6f50ea">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(H3:H"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="448" y="0" width="54" height="17" uuid="a8349358-ac1c-4187-96ae-895d631ceabf">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(I3:I"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="502" y="0" width="54" height="17" uuid="11cf16b8-3dc5-4531-950c-bfee2f6f1598">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(J3:J"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="556" y="0" width="54" height="17" uuid="bae7965a-c118-4c25-9f01-cdca08f497c2">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(K3:K"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="610" y="0" width="54" height="17" uuid="780eef30-a609-47f5-a340-1e19fe705921">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(L3:L"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="664" y="0" width="57" height="17" uuid="3e6da06d-5815-4d15-b98f-1c5eb89048a4">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(M3:M"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="721" y="0" width="54" height="17" uuid="7b437dcf-3adc-47b0-a33f-e79bea0e470c">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0.00;-###0.00"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(N3:N"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;-###0" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="775" y="0" width="55" height="17" uuid="31b15147-6e10-4bdd-8c53-7fca2fe4aa7d">
+					<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+					<property name="net.sf.jasperreports.export.xls.column.width" value="70"/>
+					<property name="net.sf.jasperreports.export.xls.pattern" value="###0;-###0"/>
+					<propertyExpression name="net.sf.jasperreports.export.xls.formula"><![CDATA["SUM(O3:O"+($V{REPORT_COUNT}.intValue()+2)+")"]]></propertyExpression>
+				</reportElement>
+				<textElement textAlignment="Right" markup="none">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,20 @@
+<div class="form-group col-xs-2">
+   <label>Month</label> 
+   <Select class="form-control" name="month"
+      id="month">
+      <option value="0">----Select----</option>
+      #foreach($objMonth in $monthList )
+      <option value='$objMonth'>$objMonth</option>
+      #end
+   </select>
+</div>
+<div class="form-group col-xs-2">
+   <label>Year</label> 
+   <Select class="form-control" name="year"
+      id="year">
+      <option value="0">----Select----</option>
+      #foreach($objyear in $yearList )
+      <option value='$objyear'>$objyear</option>
+      #end
+   </select>
+</div>

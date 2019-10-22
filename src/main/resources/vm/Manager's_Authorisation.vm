@@ -1,0 +1,39 @@
+<div class="auth-container ">
+   <div class="">
+      <header class="auth-header">
+         <h1 class="auth-title">
+            <div class="logo">
+               <span class="l l1"></span> <span class="l l2"></span> <span
+                  class="l l3"></span> <span class="l l4"></span> <span
+                  class="l l5"></span>
+            </div>
+            Pharm@dmin
+         </h1>
+      </header>
+      <div class="auth-content">
+         <p class="text-xs-center"style="margin-bottom: 1rem;">Manager's Authorisation</p>
+         <form  id="loginform"
+            class="form-horizontal" role="form">
+            <div class="form-group">
+               <label for="username">User name/Email id</label> <input type="text" autofocus="autofocus"
+                  class="form-control underlined" name="username" id="username"
+                  placeholder="Your user name" required style="text-align: left;">
+            </div>
+            <div class="form-group">
+               <label for="password">Password</label> <input type="password"
+                  class="form-control underlined" name="password" id="password"
+                  placeholder="Your password" required style="text-align: left;">
+            </div>
+            <div class="form-group">
+               <button type="button" class="btn  btn-primary" onclick="openManagerauthDo()">Ok</button>
+               <button type="button" class="btn  btn-primary pull-right"  onclick="$('#manager-modal').modal('hide');alert('Cannot Proceed until Manager authorises theses Details.')">Cancel</button>
+            </div>
+         </form>
+      </div>
+   </div>
+   <!-- 			<div class="text-xs-center"> -->
+   <!-- 				<a href="index.html" class="btn btn-secondary rounded btn-sm"> <i -->
+   <!-- 					class="fa fa-arrow-left"></i>  -->
+   <!-- 				</a> -->
+   <!-- 			</div> -->
+</div>

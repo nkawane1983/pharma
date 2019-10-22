@@ -1,0 +1,4 @@
+<option value='0'>---Select Branch---</option>
+#foreach($obj in $branchlist )
+<option value='$obj.id'>$obj.description</option>
+#end

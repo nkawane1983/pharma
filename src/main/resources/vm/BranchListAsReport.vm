@@ -1,0 +1,3 @@
+#foreach($obj in $branchlist )
+<span class="dropdownGroupItems"><input type="checkbox" name="branchidBox" id='$obj.id' value='$obj.id' onclick="selectedBranch(this)">&nbsp;$obj.description</span>
+#end

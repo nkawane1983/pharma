@@ -1,0 +1,163 @@
+
+<input type="hidden" id="taking" value="$numberTool.format("#0.00",$taking)"/>
+<div class="col-sm-4 col-xs-12 table-flip-scroll">
+   <table class="table" id="cashtable" style="border: 1px solid #52BCD3 !important;">
+      <thead>
+         <tr>
+            <th><label class="control-label" for="formGroupExampleInput2">Denomination
+               </label>
+            </th>
+            <th></th>
+            <th><label class="control-label" for="formGroupExampleInput2">Quantity
+               </label>
+            </th>
+            <th></th>
+            <th><label class="control-label" for="formGroupExampleInput2">Amount
+               </label>
+            </th>
+         </tr>
+      </thead>
+      <tbody >
+         #foreach($cash in $cashlist )
+         <tr>
+            <td><label>$cash.denominations</label></td>
+            <td>&nbsp;x&nbsp;</td>
+            <td><input name="enett1" class="form-control"
+               id="qut_$cash.multiplier"
+               onkeypress="cashCalculate(this);return isNumber(this, event);" value="$cash.quantity"
+               readonly="readonly" tabindex="8"></td>
+            <td>&nbsp;=&nbsp;</td>
+            <td><input name="text[]" class="form-control" required="required" id="amt_$cash.multiplier"
+               readonly="readonly" value="$numberTool.format("#0.00", $cash.amount)"/>
+            </td>
+         </tr>
+         #end
+      </tbody>
+      <tfoot>
+         <tr>
+            <td colspan="4"><label><strong>
+               Cash</strong></label>
+            </td>
+            <td><input id="cashobj" name="cashobj" class="form-control"  type="text" readonly="true"></td>
+         </tr>
+         <tr>
+            <td colspan="4"><label><strong>Total
+               Discrepancy</strong></label>
+            </td>
+            <td><input id="discr" name="discr" class="form-control"  readonly="readonly" type="text" value="0.0"></td>
+         </tr>
+         <tr>
+            <td colspan="4"><label><strong>Total outstanging Cash</strong></label></td>
+            <td><input id="outsatanding" name="outsatanding" class="form-control"   type="text" readonly="true" value="$numberTool.format("#0.00", $outstangingAmount.amount)"></td>
+         </tr>
+         <tr>
+            <td colspan="4"><label><strong>Total carry/forward	Cash</strong></label></td>
+            <td><input id="cfamount" name="cfamount" class="form-control"   type="text" onkeypress="return isNumberKey(this,event)" value="0.0" onkeydown="carryForwrd()"></td>
+         </tr>
+      </tfoot>
+   </table>
+</div>
+<div class="col-sm-4 col-xs-12 table-flip-scroll">
+   <div class="col-xs-6 col-sm-12" style="margin-bottom: 1.0rem;">
+      <table class="table">
+         <thead>
+            <tr>
+               <th colspan="2"
+                  ><label
+                  class="control-label" for="formGroupExampleInput2">Cheques
+                  </label>
+               </th>
+            </tr>
+         </thead>
+      </table>
+      <div
+         style="height: 130px; overflow: auto; border: 1px solid #52BCD3 !important;">
+         <table class="table" id="tblCheques">
+            <tbody>
+               #foreach($unbankingcheques in $unCheques)
+               <tr>
+                  <td ><label
+                     class="control-label" for="formGroupExampleInput2">$unbankingcheques.accountNo</label></td>
+                  <td ><label
+                     class="control-label" for="formGroupExampleInput2">$unbankingcheques.cname</label></td>
+                  <td
+                     style="text-align: right; width: 80px;"><label
+                     class="control-label" for="formGroupExampleInput2">$numberTool.format("#0.00", $unbankingcheques.amount)</label>&nbsp;&nbsp;</td>
+               </tr>
+               #end
+            </tbody>
+         </table>
+      </div>
+      <div>
+         <table class="table">
+            <tfoot >
+               <tr>
+                  <td style="width: 150px; vertical-align: bottom; "><label class="control-label" for="formGroupExampleInput2"><strong>Total
+                     Cheques bank</strong></label>
+                  </td>
+                  <td ><input id="totalCheques" name="cheques" class="form-control" value="0.0" readonly="readonly" type="text"></td>
+               </tr>
+            </tfoot>
+         </table>
+      </div>
+   </div>
+   <div class="col-xs-6 col-sm-12 table-flip-scroll" style="margin-bottom: 1.0rem;">
+      <table class="table" style="margin-bottom: 0.0rem;">
+         <thead>
+            <tr>
+               <th colspan="2"
+                  ><label
+                  class="control-label" for="formGroupExampleInput2">Other
+                  Income </label>
+               </th>
+            </tr>
+         </thead>
+      </table>
+      <div
+         style="height: 130px; overflow: auto; border: 1px solid #52BCD3 !important;">
+         <table class="table" id="tblPaidOut">
+            <tbody>
+               #foreach($unbankingpaidouts in $unPaidout)
+               <tr>
+                  <td ><label
+                     class="control-label" for="formGroupExampleInput2">
+                     #foreach($paidoutlist in $paidoutlist )
+                     #if($unbankingpaidouts.ctype==$paidoutlist.id)
+                     $paidoutlist.categoryName
+                     #end
+                     #end
+                     </label>
+                  </td>
+                  <td
+                     style=" text-align: right; width: 80px;"><label
+                     class="control-label" for="formGroupExampleInput2">$numberTool.format("#0.00", $unbankingpaidouts.amount)</label></td>
+               </tr>
+               #end
+            </tbody>
+         </table>
+      </div>
+      <div>
+         <table class="table">
+            <tfoot>
+               <tr>
+                  <td
+                     style="width: 150px; vertical-align: bottom; border: 1px solid #52BCD3 !important;"><label
+                     class="control-label" for="formGroupExampleInput2"><strong>Total Other Income </strong>
+                     </label>
+                  </td>
+                  <td style="border: 1px solid #52BCD3 !important;"><input
+                     name="miscCash" class="form-control" required="required"
+                     id="miscCash" readonly="true" value="0.0"/></td>
+               </tr>
+            </tfoot>
+         </table>
+      </div>
+   </div>
+   <div class="col-sm-12 col-xs-12">
+      <label class="control-label" for="formGroupExampleInput2">Comment:</label>
+   </div>
+   <div class="col-sm-12 col-xs-12">
+      <textarea name="notes" id="notes"></textarea>
+   </div>
+</div>
+<input type="hidden" id="outstandingId" value="$outstangingAmount.id" name="outstandingId"/>

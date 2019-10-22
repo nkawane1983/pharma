@@ -1,0 +1,129 @@
+#foreach($obj in $nhslist )
+<div class="col col-xs-12 col-sm-12 col-md-6 col-xl-5 stats-col">
+   <div class="card stats" data-exclude="xs">
+      <div class="card-block">
+         <div class="title-block">
+            <h4 class="title">NHS Stats</h4>
+         </div>
+         <div class="row row-sm stats-container">
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-rocket"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[0]</div>
+                  <div class="name">Paid PAPER Form</div>
+                  <div></div>
+               </div>
+               <progress class="progress stat-progress" value="75" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 75%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-shopping-cart"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[1]</div>
+                  <div class="name">Paid PAPER Items</div>
+               </div>
+               <progress class="progress stat-progress" value="25" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 25%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-rocket"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[2]</div>
+                  <div class="name">Paid EPS Form</div>
+                  <div></div>
+               </div>
+               <progress class="progress stat-progress" value="75" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 75%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-shopping-cart"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[3]</div>
+                  <div class="name">Paid EPS Items</div>
+               </div>
+               <progress class="progress stat-progress" value="25" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 25%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-rocket"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[4]</div>
+                  <div class="name">Exempt PAPER Form</div>
+                  <div></div>
+               </div>
+               <progress class="progress stat-progress" value="75" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 75%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-shopping-cart"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[5]</div>
+                  <div class="name">Exempt PAPER Items</div>
+               </div>
+               <progress class="progress stat-progress" value="25" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 25%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-rocket"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[6]</div>
+                  <div class="name">Exempt EPS Form</div>
+                  <div></div>
+               </div>
+               <progress class="progress stat-progress" value="75" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 75%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+            <div class="col-xs-12 col-sm-6 stat-col">
+               <div class="stat-icon">
+                  <i class="fa fa-shopping-cart"></i>
+               </div>
+               <div class="stat">
+                  <div class="value">$obj[7]</div>
+                  <div class="name">Exempt EPS Items</div>
+               </div>
+               <progress class="progress stat-progress" value="25" max="100">
+                  <!-- 									<div class="progress"> -->
+                  <!-- 										<span class="progress-bar" style="width: 25%;"></span> -->
+                  <!-- 									</div> -->
+               </progress>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+#end
